@@ -1,0 +1,14 @@
+{
+    "id": "liuxiaohua72/kaggletesting",
+    "title": "kaggletesting",
+    "code_file": "run-torch.py",
+    "language": "python",
+    "kernel_type": "script",
+    "is_private": true,
+    "enable_gpu": false,
+    "enable_internet": true,
+    "enable_run_on_commit": true,
+    "dataset_sources": [],
+    "competition_sources": [],
+    "kernel_sources": []
+}

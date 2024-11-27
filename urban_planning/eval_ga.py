@@ -44,7 +44,7 @@ def main_loop(_):
     np.random.seed(cfg.seed)
     torch.manual_seed(cfg.seed)
 
-    checkpoint = int(FLAGS.iteration) if FLAGS.iteration.isnumeric() else FLAGS.iteration
+    checkpoint = 0
 
     """create agent"""
     agent = UrbanPlanningAgent(cfg=cfg, dtype=dtype, device=device, num_threads=1,

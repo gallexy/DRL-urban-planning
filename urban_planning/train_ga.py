@@ -14,7 +14,7 @@ from urban_planning.utils.config import Config
 from urban_planning.agents.urban_planning_agent import UrbanPlanningAgent
 
 
-flags.DEFINE_string('root_dir', '/data1/mas/zhengyu/drl_urban_planning/', 'Root directory for writing '
+flags.DEFINE_string('root_dir', '/home/lxh/dev/drl_urban_planning/', 'Root directory for writing '
                                                                           'logs/summaries/checkpoints.')
 flags.DEFINE_string('cfg', None, 'Configuration file of rl training.')
 flags.DEFINE_bool('tmp', False, 'Whether to use temporary storage.')
@@ -38,7 +38,7 @@ FLAGS = flags.FLAGS
 
 def main_loop(_):
 
-    setproctitle.setproctitle('urban_planning@zhengyu')
+    setproctitle.setproctitle('urban_planning@lxh')
 
     cfg = Config(FLAGS.cfg, FLAGS.global_seed, FLAGS.tmp, FLAGS.root_dir, 'ga')
 

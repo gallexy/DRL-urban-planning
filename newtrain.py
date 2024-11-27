@@ -11,13 +11,13 @@ from khrylib.utils import *
 from urban_planning.utils.config import Config
 from urban_planning.agents.urban_planning_agent import UrbanPlanningAgent
 
-flags.DEFINE_string('root_dir', './drl_urban_planning/', 'Root directory for writing '
+flags.DEFINE_string('root_dir', './output_urban_planning/', 'Root directory for writing '
                                                                           'logs/summaries/checkpoints.')
 flags.DEFINE_string('cfg', None, 'Configuration file of rl training.')
 flags.DEFINE_bool('tmp', False, 'Whether to use temporary storage.')
 flags.DEFINE_enum('agent', 'rl-sgnn', ['rl-sgnn', 'rl-mlp'], 'Agent type.')
 flags.DEFINE_bool('separate_train', True, 'Whether to separate the training process of land use and road planning.')
-flags.DEFINE_integer('num_threads', 8, 'The number of threads for sampling trajectories.')
+flags.DEFINE_integer('num_threads', 5, 'The number of threads for sampling trajectories.')
 flags.DEFINE_bool('use_nvidia_gpu', True, 'Whether to use Nvidia GPU for acceleration.')
 flags.DEFINE_integer('gpu_index', 0, 'GPU ID.')
 flags.DEFINE_integer('global_seed', None, 'Used in env and weight initialization, does not impact action sampling.')
