@@ -6,7 +6,7 @@ from typing import Text, Dict
 class Config:
 
     def __init__(self, cfg: Text, global_seed: int, tmp: bool, root_dir: Text,
-                 agent: Text = 'rl-sgnn', cfg_dict: Dict = None):
+                 agent: Text = 'rl-sgnn', cfg_dict: Dict = None, episodes_per_iter: int = 500):
         self.id = cfg
         self.seed = global_seed
         if cfg_dict is not None:
@@ -54,8 +54,10 @@ class Config:
         self.value_pred_coef = cfg.get('value_pred_coef', 0.5)
         self.entropy_coef = cfg.get('entropy_coef', 0.01)
         self.clip_epsilon = cfg.get('clip_epsilon', 0.2)
-        self.max_num_iterations = cfg.get('max_num_iterations', 10)
-        self.num_episodes_per_iteration = cfg.get('num_episodes_per_iteration', 10)
+        self.max_num_iterations = cfg.get('max_num_iterations', 1000)
+        #取self.num_episodes_per_iteration为episodes_per_iter和cfg中的num_episodes_per_iteration的最小值
+        self.num_episodes_per_iteration = min(cfg.get('num_episodes_per_iteration', 500), episodes_per_iter)
+        #self.num_episodes_per_iteration = cfg.get('num_episodes_per_iteration', 500)
         self.max_sequence_length = cfg.get('max_sequence_length', 100)
         self.original_max_sequence_length = cfg.get('max_sequence_length', 100)
         self.num_optim_epoch = cfg.get('num_optim_epoch', 4)

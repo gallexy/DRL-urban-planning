@@ -1,8 +1,8 @@
 import os
 import setproctitle
 
-import warnings
-warnings.simplefilter(action='ignore', category=FutureWarning)
+#import warnings
+#warnings.simplefilter(action='ignore', category=FutureWarning)
 
 from absl import app
 from absl import flags
@@ -10,6 +10,9 @@ from absl import flags
 from khrylib.utils import *
 from urban_planning.utils.config import Config
 from urban_planning.agents.urban_planning_agent import UrbanPlanningAgent
+import torch
+
+torch.set_num_threads(1)
 
 flags.DEFINE_string('root_dir', './output_urban_planning/', 'Root directory for writing '
                                                                           'logs/summaries/checkpoints.')
@@ -18,6 +21,8 @@ flags.DEFINE_bool('tmp', False, 'Whether to use temporary storage.')
 flags.DEFINE_enum('agent', 'rl-sgnn', ['rl-sgnn', 'rl-mlp'], 'Agent type.')
 flags.DEFINE_bool('separate_train', True, 'Whether to separate the training process of land use and road planning.')
 flags.DEFINE_integer('num_threads', 5, 'The number of threads for sampling trajectories.')
+flags.DEFINE_integer('episodes_per_iter', 500, 'The number of episodes for every iteration.')
+
 flags.DEFINE_bool('use_nvidia_gpu', True, 'Whether to use Nvidia GPU for acceleration.')
 flags.DEFINE_integer('gpu_index', 0, 'GPU ID.')
 flags.DEFINE_integer('global_seed', None, 'Used in env and weight initialization, does not impact action sampling.')
@@ -43,9 +48,10 @@ def train_one_iteration(agent: UrbanPlanningAgent, iteration: int) -> None:
 
 def main_loop(_):
 
+    print(f'flag: {FLAGS}')
     setproctitle.setproctitle(f'urban_planning_{FLAGS.cfg}_{FLAGS.global_seed}')
 
-    cfg = Config(FLAGS.cfg, FLAGS.global_seed, FLAGS.tmp, FLAGS.root_dir, FLAGS.agent)
+    cfg = Config(FLAGS.cfg, FLAGS.global_seed, FLAGS.tmp, FLAGS.root_dir, FLAGS.agent, episodes_per_iter=FLAGS.episodes_per_iter)
 
     dtype = torch.float32
     torch.set_default_dtype(dtype)
