@@ -48,7 +48,7 @@ def train_one_iteration(agent: UrbanPlanningAgent, iteration: int) -> None:
 
 def main_loop(_):
 
-    print(f'flag: {FLAGS}')
+    #print(f'flag: {FLAGS}')
     setproctitle.setproctitle(f'urban_planning_{FLAGS.cfg}_{FLAGS.global_seed}')
 
     cfg = Config(FLAGS.cfg, FLAGS.global_seed, FLAGS.tmp, FLAGS.root_dir, FLAGS.agent, episodes_per_iter=FLAGS.episodes_per_iter)

@@ -64,7 +64,7 @@ class UrbanPlanningAgent(AgentPPO):
             episode_success = False
             logger_messages = []
             memory_messages = []
-            for t in range(100):
+            for t in range(10000):
                 try:
                     state_var = tensorfy([state])
                     use_mean_action = mean_action or torch.bernoulli(torch.tensor([1 - self.noise_rate])).item()
@@ -96,7 +96,7 @@ class UrbanPlanningAgent(AgentPPO):
                     logger.step(self.env, *logger_messages[var])
                     self.push_memory(memory, *memory_messages[var])
                 logger.end_episode(last_info)
-                self.thread_loggers[pid].info('worker {} finished episode {}.'.format(pid, logger.num_episodes))
+                self.thread_loggers[pid].info('worker {} finished episode {} steps:{} t: {}.'.format(pid, logger.num_episodes, logger.num_steps, t))
 
         if queue is not None:
             queue.put([pid, memory, logger])
