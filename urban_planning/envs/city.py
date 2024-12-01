@@ -13,7 +13,6 @@ import matplotlib.pyplot as plt
 from urban_planning.envs.plan_client import PlanClient
 from urban_planning.envs.observation_extractor import ObservationExtractor
 from urban_planning.envs import city_config
-from urban_planning.utils.config import Config
 
 
 class InfeasibleActionError(ValueError):
@@ -42,6 +41,7 @@ def reward_info_function(
     life_circle_weight: float = 1.0,
     greenness_weight: float = 1.0,
     concept_weight: float = 0.0,
+    carbon_emission_weight: float = 0.0,
     weight_by_area: bool = False) -> Tuple[float, Dict]:
     """Returns the RL reward and info.
 
@@ -52,6 +52,7 @@ def reward_info_function(
         life_circle_weight: Weight of 15-min life circle in the reward function.
         greenness_weight: Weight of greenness in the reward function.
         concept_weight: Weight of planning concept in the reward function.
+        carbon_emission_weight: Weight of carbon emission in the reward function.
         weight_by_area: Whether to weight the life circle reward by the area of residential zones.
 
     Returns:
@@ -60,12 +61,24 @@ def reward_info_function(
     """
     proxy_reward = CityEnv.INTERMEDIATE_REWARD
 
+    # Carbon emission coefficients for different land use types (tons of CO2 per hectare)
+    carbon_emission_coefficients = {
+        'business': 192.94,
+        'office': 29.0,
+        'green_l': 0.0,
+        'school': 320.6,
+        'hospital_l': 20.0,
+        'hospital_s': 18.0,
+        'recreation': 20.0
+    }
+
     if name == 'intermediate':
         return proxy_reward, {
             'road_network': -1.0,
             'life_circle': -1.0,
             'greenness': -1.0,
             'concept': -1.0,
+            'carbon_emission': -1.0,
         }
     elif name == 'road':
         proxy_reward = 0.0
@@ -79,6 +92,7 @@ def reward_info_function(
             'life_circle': -1.0,
             'greenness': -1.0,
             'concept': -1.0,
+            'carbon_emission': -1.0,
             'road_network_info': road_network_info
         }
     elif name == 'land_use':
@@ -86,6 +100,7 @@ def reward_info_function(
         life_circle = -1.0
         greenness = -1.0
         concept = -1.0
+        carbon_emission = -1.0
 
         life_circle_info = dict()
         if life_circle_weight > 0.0:
@@ -101,11 +116,19 @@ def reward_info_function(
             concept, concept_info = plc.get_concept_reward()
             proxy_reward += concept_weight * concept
 
+        if carbon_emission_weight > 0.0:
+            carbon_emission = plc.get_carbon_emission_reward()
+            # Normalize carbon emission values to the same scale as other rewards (0-1)
+            max_carbon_emission = max(carbon_emission_coefficients.values())
+            normalized_carbon_emission = carbon_emission / max_carbon_emission
+            proxy_reward += carbon_emission_weight * normalized_carbon_emission
+
         return proxy_reward, {
             'road_network': -1.0,
             'life_circle': life_circle,
             'greenness': greenness,
             'concept': concept,
+            'carbon_emission': carbon_emission,
             'life_circle_info': life_circle_info,
             'concept_info': concept_info
         }
@@ -134,6 +157,7 @@ class CityEnv:
                                        life_circle_weight=cfg.reward_specs.get('life_circle_weight', 1.0),
                                        greenness_weight=cfg.reward_specs.get('greenness_weight', 1.0),
                                        concept_weight=cfg.reward_specs.get('concept_weight', 0.0),
+                                       carbon_emission_weight=cfg.reward_specs.get('carbon_emission_weight', 0.0),
                                        weight_by_area=cfg.reward_specs.get('weight_by_area', False))
 
         self._all_stages = ['land_use', 'road', 'done']
@@ -179,6 +203,7 @@ class CityEnv:
             self._cached_life_circle_reward = -1.0
             self._cached_greenness_reward = -1.0
             self._cached_concept_reward = -1.0
+            self._cached_carbon_emission_reward = -1.0
 
             self._cached_life_circle_info = dict()
             self._cached_concept_info = dict()
@@ -197,6 +222,7 @@ class CityEnv:
         self._cached_life_circle_reward = info['life_circle']
         self._cached_greenness_reward = info['greenness']
         self._cached_concept_reward = info['concept']
+        self._cached_carbon_emission_reward = info['carbon_emission']
         self._cached_life_circle_info = info['life_circle_info']
         self._cached_concept_info = info['concept_info']
         self._frozen = True
@@ -244,6 +270,7 @@ class CityEnv:
             'road_network': road_info['road_network'],
             'life_circle': land_use_info['life_circle'],
             'greenness': land_use_info['greenness'],
+            'carbon_emission': land_use_info['carbon_emission'],
             'road_network_info': road_info['road_network_info'],
             'life_circle_info': land_use_info['life_circle_info']
         }
@@ -414,6 +441,7 @@ class CityEnv:
             'road_network': -1.0,
             'life_circle': -1.0,
             'greenness': -1.0,
+            'carbon_emission': -1.0,
         }
         return self._get_obs(), self.FAILURE_REWARD, True, info
 
@@ -475,6 +503,7 @@ class CityEnv:
                     self._cached_life_circle_reward = info['life_circle']
                     self._cached_greenness_reward = info['greenness']
                     self._cached_concept_reward = info['concept']
+                    self._cached_carbon_emission_reward = info['carbon_emission']
 
                     self._cached_life_circle_info = info['life_circle_info']
                     self._cached_concept_info = info['concept_info']
@@ -510,6 +539,7 @@ class CityEnv:
                 info['life_circle'] = self._cached_life_circle_reward
                 info['greenness'] = self._cached_greenness_reward
                 info['concept'] = self._cached_concept_reward
+                info['carbon_emission'] = self._cached_carbon_emission_reward
 
                 info['life_circle_info'] = self._cached_life_circle_info
                 info['concept_info'] = self._cached_concept_info
