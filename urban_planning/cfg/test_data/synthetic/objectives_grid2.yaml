@@ -60,3 +60,12 @@ constraints:
     school: 80
     hospital_s: 80
     recreation: 80
+carbon_emissions:
+  residential: 248
+  business: 193
+  office: 29
+  green_l: 0
+  school: 321
+  hospital_l: 20
+  hospital_s: 18
+  recreation: 20

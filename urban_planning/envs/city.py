@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 from urban_planning.envs.plan_client import PlanClient
 from urban_planning.envs.observation_extractor import ObservationExtractor
 from urban_planning.envs import city_config
+from urban_planning.utils.config import Config
 
 
 class InfeasibleActionError(ValueError):
@@ -119,9 +120,9 @@ def reward_info_function(
         if carbon_emission_weight > 0.0:
             carbon_emission = plc.get_carbon_emission_reward()
             # Normalize carbon emission values to the same scale as other rewards (0-1)
-            max_carbon_emission = max(carbon_emission_coefficients.values())
-            normalized_carbon_emission = carbon_emission / max_carbon_emission
-            proxy_reward += carbon_emission_weight * normalized_carbon_emission
+            #max_carbon_emission = max(carbon_emission_coefficients.values())
+            #normalized_carbon_emission = carbon_emission / 100000  #10wan吨
+            proxy_reward -= carbon_emission_weight * carbon_emission
 
         return proxy_reward, {
             'road_network': -1.0,

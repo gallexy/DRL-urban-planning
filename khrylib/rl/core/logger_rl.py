@@ -9,7 +9,7 @@ class LoggerRL:
         self.num_steps = 0
         self.num_episodes = 0
         self.sample_time = 0
-        self.stats_names = ['episode_len', 'reward', 'episode_reward', 'road_network', 'life_circle', 'greenness']
+        self.stats_names = ['episode_len', 'reward', 'episode_reward', 'road_network', 'life_circle', 'greenness', 'carbon_emission']
         if init_stats_logger:
             self.stats_loggers = {x: StatsLogger(is_nparray=False) for x in self.stats_names}
         self.plans = []
@@ -31,6 +31,7 @@ class LoggerRL:
         self.stats_loggers['road_network'].log(info['road_network'])
         self.stats_loggers['life_circle'].log(info['life_circle'])
         self.stats_loggers['greenness'].log(info['greenness'])
+        self.stats_loggers['carbon_emission'].log(info['carbon_emission'])
 
     def add_plan(self, info_plan):
         self.plans.append(info_plan)

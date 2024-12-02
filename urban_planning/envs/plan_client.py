@@ -48,7 +48,27 @@ class PlanClient(object):
         self.init_plan = load_pickle(file_path)
         self.init_objectives()
         self.init_constraints()
+        self.init_carbon()
         self.restore_plan()
+
+    def init_carbon(self) -> None:
+        """Initializes carbon."""
+        objectives = self.objectives
+        #check if carbon_emissions is in objectives
+        if 'carbon_emissions' in objectives:
+            carbon_dict = objectives['carbon_emissions']
+            self._carbon_emission_dict = {}
+            for k, v in carbon_dict.items():
+                try:
+                    self._carbon_emission_dict[city_config.LAND_USE_ID_MAP[k]] = v
+                except KeyError:
+                    print(f"Warning: Key '{k}' not found in LAND_USE_ID_MAP. Skipping.")
+                    # Or handle the missing key in another way, e.g., using a default value
+                    # carbon_emission_dict_id[0] = v # Example: Assign to OUTSIDE if key not found
+        else:
+            self._carbon_emission_dict = None
+        print("Carbon emissions:")
+        print(self._carbon_emission_dict)
 
     def init_objectives(self) -> None:
         """Initializes objectives of different land uses."""
@@ -950,6 +970,25 @@ class PlanClient(object):
             return reward, info
         else:
             return 0.0, dict()
+
+    def get_carbon_emission_reward(self) -> float:
+        """Get the reward of the carbon emission.
+
+        Returns:
+            The reward of the carbon emission.
+        """
+        def m2_ha(x):
+            return x/10000
+        gdf = self._gdf[self._gdf['existence'] == True]
+        reward = 0.0
+        #residential_area = gdf[gdf['type'] == city_config.RESIDENTIAL].area.to_numpy()
+        #res_reward = residential_area/10000 * self._carbon_emission_dict['residential']
+        #为其他类型地块同样处理
+        for land_type in self._carbon_emission_dict.keys():
+            land_use_area = gdf[gdf['type'] == land_type].area.to_numpy()
+            reward += np.sum(land_use_area)/10000 * self._carbon_emission_dict[land_type]/10000  
+            #碳排放单位为10000吨
+        return reward
 
     def get_greenness_reward(self) -> float:
         """Get the reward of the greenness.
