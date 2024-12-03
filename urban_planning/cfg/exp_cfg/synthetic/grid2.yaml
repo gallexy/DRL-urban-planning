@@ -30,7 +30,7 @@ state_encoder_specs:
   max_num_edges: 3000
   num_attention_heads: 1
 policy_specs:
-  policy_land_use_head_hidden_size: [32,32, 1]
+  policy_land_use_head_hidden_size: [32, 1]
   policy_road_head_hidden_size: [32, 1]
 value_specs:
   value_head_hidden_size: [32, 32, 1]

@@ -62,16 +62,6 @@ def reward_info_function(
     """
     proxy_reward = CityEnv.INTERMEDIATE_REWARD
 
-    # Carbon emission coefficients for different land use types (tons of CO2 per hectare)
-    carbon_emission_coefficients = {
-        'business': 192.94,
-        'office': 29.0,
-        'green_l': 0.0,
-        'school': 320.6,
-        'hospital_l': 20.0,
-        'hospital_s': 18.0,
-        'recreation': 20.0
-    }
 
     if name == 'intermediate':
         return proxy_reward, {

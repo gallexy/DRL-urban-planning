@@ -463,10 +463,12 @@ class UrbanPlanningAgent(AgentPPO):
         tb_logger.add_scalar('train/train_R_road_network_eps_avg', log.avg_episode_road_network_reward, iteration)
         tb_logger.add_scalar('train/train_R_life_circle_eps_avg', log.avg_episode_life_circle_reward, iteration)
         tb_logger.add_scalar('train/train_R_greenness_eps_avg', log.avg_episode_greenness_reward, iteration)
+        tb_logger.add_scalar('train/train_R_carbon_emission_eps_avg', log.avg_episode_carbon_emission_reward, iteration)
         tb_logger.add_scalar('eval/eval_R_eps_avg', log_eval.avg_episode_reward + self.reward_offset, iteration)
         tb_logger.add_scalar('eval/eval_R_road_network_eps_avg', log_eval.avg_episode_road_network_reward, iteration)
         tb_logger.add_scalar('eval/eval_R_life_circle_eps_avg', log_eval.avg_episode_life_circle_reward, iteration)
         tb_logger.add_scalar('eval/eval_R_greenness_eps_avg', log_eval.avg_episode_greenness_reward, iteration)
+        tb_logger.add_scalar('eval/eval_R_carbon_emission_eps_avg', log_eval.avg_episode_carbon_emission_reward, iteration)
 
     def eval_agent(self, num_samples=1, mean_action=True, visualize=False):
         t_start = time.time()

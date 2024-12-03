@@ -53,5 +53,6 @@ class LoggerRL:
         logger.avg_episode_road_network_reward = logger.stats_loggers['road_network'].avg()
         logger.avg_episode_life_circle_reward = logger.stats_loggers['life_circle'].avg()
         logger.avg_episode_greenness_reward = logger.stats_loggers['greenness'].avg()
+        logger.avg_episode_carbon_emission_reward = logger.stats_loggers['carbon_emission'].avg()
         logger.plans = list(itertools.chain(*[var.plans for var in logger_list]))
         return logger
