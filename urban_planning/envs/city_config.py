@@ -7,6 +7,7 @@ NON_BLOCK_LAND_USE = (
 
 BLOCK_LAND_USE = (
     'residential',
+    'residential_h',
     'business',
     'office',
     'green_l',
@@ -25,14 +26,15 @@ FEASIBLE = 1
 ROAD = 2
 BOUNDARY = 3
 RESIDENTIAL = 4
-BUSINESS = 5
-OFFICE = 6
-GREEN_L = 7
-GREEN_S = 8
-SCHOOL = 9
-HOSPITAL_L = 10
-HOSPITAL_S = 11
-RECREATION = 12
+RESIDENTIAL_H = 5
+BUSINESS = 6
+OFFICE = 7
+GREEN_L = 8
+GREEN_S = 9
+SCHOOL = 10
+HOSPITAL_L = 11
+HOSPITAL_S = 12
+RECREATION = 13
 
 LAND_USE_ID = (
     OUTSIDE,
@@ -40,6 +42,7 @@ LAND_USE_ID = (
     ROAD,
     BOUNDARY,
     RESIDENTIAL,
+    RESIDENTIAL_H,
     BUSINESS,
     OFFICE,
     GREEN_L,
@@ -58,7 +61,7 @@ LAND_USE_ID_MAP = dict(
 LAND_USE_ID_MAP_INV = dict(
     zip(LAND_USE_ID, LAND_USE))
 
-INTERSECTION = 13
+INTERSECTION = 14
 
 PUBLIC_SERVICES_ID = (
     BUSINESS,
@@ -93,6 +96,7 @@ TYPE_COLOR_MAP = {
     'office': 'gold',
     'outside': 'black',
     'residential': 'yellow',
+    'residential_h': 'orange',
     'road': 'red',
     'school': 'darkorange',
     'recreation': 'lavender',
