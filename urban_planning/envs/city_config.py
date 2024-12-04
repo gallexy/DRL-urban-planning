@@ -7,11 +7,10 @@ NON_BLOCK_LAND_USE = (
 
 BLOCK_LAND_USE = (
     'residential',
-    'residential_h',
     'business',
-    'office',
+    'business_h',
     'green_l',
-    'green_s',
+    'residential_h',
     'school',
     'hospital_l',
     'hospital_s',
@@ -26,15 +25,15 @@ FEASIBLE = 1
 ROAD = 2
 BOUNDARY = 3
 RESIDENTIAL = 4
-RESIDENTIAL_H = 5
-BUSINESS = 6
-OFFICE = 7
-GREEN_L = 8
-GREEN_S = 9
-SCHOOL = 10
-HOSPITAL_L = 11
-HOSPITAL_S = 12
-RECREATION = 13
+BUSINESS = 5
+BUSINESS_H = 6
+GREEN_L = 7
+RESIDENTIAL_H = 8
+SCHOOL = 9
+HOSPITAL_L = 10
+HOSPITAL_S = 11
+RECREATION = 12
+
 
 LAND_USE_ID = (
     OUTSIDE,
@@ -42,11 +41,10 @@ LAND_USE_ID = (
     ROAD,
     BOUNDARY,
     RESIDENTIAL,
-    RESIDENTIAL_H,
     BUSINESS,
-    OFFICE,
+    BUSINESS_H,
     GREEN_L,
-    GREEN_S,
+    RESIDENTIAL_H,
     SCHOOL,
     HOSPITAL_L,
     HOSPITAL_S,
@@ -61,11 +59,16 @@ LAND_USE_ID_MAP = dict(
 LAND_USE_ID_MAP_INV = dict(
     zip(LAND_USE_ID, LAND_USE))
 
-INTERSECTION = 14
+INTERSECTION = 13
+
+RESIDENTIAL_ID = (
+    RESIDENTIAL,
+    RESIDENTIAL_H
+)
 
 PUBLIC_SERVICES_ID = (
     BUSINESS,
-    OFFICE,
+    BUSINESS_H,
     SCHOOL,
     (HOSPITAL_L, HOSPITAL_S),
     RECREATION
@@ -80,24 +83,22 @@ PUBLIC_SERVICES = (
 )
 
 GREEN_ID = (
-    GREEN_L,
-    GREEN_S
+    GREEN_L
 )
 GREEN_AREA_THRESHOLD = 2000
 
 TYPE_COLOR_MAP = {
     'boundary': 'lightgreen',
-    'business': 'fuchsia',
+    'business': 'red',
     'feasible': 'white',
     'green_l': 'green',
-    'green_s': 'lightgreen',
     'hospital_l': 'blue',
     'hospital_s': 'cyan',
-    'office': 'gold',
+    'business_h': 'orange',
     'outside': 'black',
     'residential': 'yellow',
-    'residential_h': 'orange',
-    'road': 'red',
+    'residential_h': 'brown',
+    'road': 'blue',
     'school': 'darkorange',
     'recreation': 'lavender',
 }

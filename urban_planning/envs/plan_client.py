@@ -27,10 +27,10 @@ class PlanClient(object):
         city_config.HOSPITAL_S,
         city_config.RECREATION,
         city_config.RESIDENTIAL,
+        city_config.RESIDENTIAL_H,
         city_config.GREEN_L,
-        city_config.OFFICE,
-        city_config.BUSINESS,
-        city_config.GREEN_S], dtype=np.int32)
+        city_config.BUSINESS_H,
+        city_config.BUSINESS], dtype=np.int32)
     EPSILON = 1E-4
     DEG_TOL = 1
     SNAP_EPSILON = 1
@@ -157,6 +157,7 @@ class PlanClient(object):
     def restore_plan(self) -> None:
         """Restore the initial plan."""
         self._initial_gdf = self.init_plan['gdf']
+        self._initial_gdf = self._initial_gdf.set_crs("EPSG:3857",allow_override=True)
         self._gdf = copy.deepcopy(self._initial_gdf)
         self._add_domain_features()
         self._load_concept(self.init_plan.get('concept', list()))
@@ -242,9 +243,9 @@ class PlanClient(object):
         self._initial_gdf = copy.deepcopy(land_use_gdf)
 
     def fill_leftover(self) -> None:
-        """Fill leftover space."""
+        """Fill leftover space. use recreation replaced green_s -- by lamb"""
         self._gdf.loc[(self._gdf['type'] == city_config.FEASIBLE) & (self._gdf['existence'] == True),
-                      'type'] = city_config.GREEN_S
+                      'type'] = city_config.RECREATION
 
     def snapshot(self):
         """Snapshot the gdf."""
@@ -726,8 +727,9 @@ class PlanClient(object):
                 land_use_polygon = self._use_whole_feasible(feasible_polygon, land_use_type)
             else:
                 if land_use_polygon.area*self._cell_area < self._required_min_area[land_use_type]:
-                    land_use_polygon = self._update_gdf(land_use_polygon, city_config.GREEN_S)
-                    actual_land_use_type = city_config.GREEN_S
+                    #replaced green_s with recreation 
+                    land_use_polygon = self._update_gdf(land_use_polygon, city_config.RECREATION)
+                    actual_land_use_type = city_config.RECREATION
                 else:
                     land_use_polygon = self._update_gdf(land_use_polygon, land_use_type)
 
@@ -913,8 +915,8 @@ class PlanClient(object):
             The reward of the life circle.
         """
         gdf = self._gdf[self._gdf['existence'] == True]
-        residential_centroid = gdf[gdf['type'] == city_config.RESIDENTIAL].centroid
-        residential_area = gdf[gdf['type'] == city_config.RESIDENTIAL].area.to_numpy()
+        residential_centroid = gdf[gdf['type'].isin(city_config.RESIDENTIAL_ID) ].centroid
+        residential_area = gdf[gdf['type'].isin(city_config.RESIDENTIAL_ID)].area.to_numpy()
         num_public_service = 0
         minimum_public_service_distances = []
         public_service_pairwise_distances = []

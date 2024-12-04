@@ -1,11 +1,12 @@
 community:
-  name: grid
+  name: grid2
   grid_cols: 240
   grid_rows: 240
   cell_edge_length: 10
 objectives:
   land_use:
     - residential
+    - residential_h
     - business
     - office
     - green_l
@@ -17,6 +18,7 @@ objectives:
     residential: 0.600
   count:
     business: 8
+    residential_h: 2
     office: 4
     green_l: 4
     school: 3
@@ -25,7 +27,8 @@ objectives:
     recreation: 5
 constraints:
   max_area:
-    residential: 300000
+    residential: 40000
+    residential_h: 40000
     green_l: 90000
     hospital_l: 30000
     business: 20000
@@ -35,6 +38,7 @@ constraints:
     recreation: 10000
   min_area:
     residential: 20000
+    residential_h: 20000
     green_l: 15000
     hospital_l: 10000
     business: 10000
@@ -44,6 +48,7 @@ constraints:
     recreation: 2000
   max_edge_length:
     residential: 600
+    residential_h: 600
     green_l: 300
     hospital_l: 200
     business: 200
@@ -53,6 +58,7 @@ constraints:
     recreation: 150
   min_edge_length:
     residential: 100
+    residential_h: 100
     green_l: 100
     hospital_l: 100
     business: 100
@@ -62,8 +68,9 @@ constraints:
     recreation: 80
 carbon_emissions:
   residential: 248
+  residential_h: 345.9
   business: 193
-  office: 29
+  office: 906
   green_l: 0
   school: 321
   hospital_l: 20

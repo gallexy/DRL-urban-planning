@@ -597,12 +597,15 @@ class CityEnv:
         Plot and save the gdf.
         """
         gdf = CityEnv._add_legend_to_gdf(gdf)
+        fig, ax = plt.subplots(figsize=(12, 8))
+        ax.set_aspect('equal')
         gdf.plot(
             'legend',
             cmap=cmap,
             categorical=True,
             legend=legend,
-            legend_kwds={'bbox_to_anchor': (1.8, 1)}
+            legend_kwds={'bbox_to_anchor': (1.8, 1)},
+            ax=ax
         )
         if not ticks:
             plt.xticks([])
