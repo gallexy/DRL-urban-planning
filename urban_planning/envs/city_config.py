@@ -83,22 +83,23 @@ PUBLIC_SERVICES = (
 )
 
 GREEN_ID = (
-    GREEN_L
+    GREEN_L,
+    RECREATION
 )
 GREEN_AREA_THRESHOLD = 2000
 
 TYPE_COLOR_MAP = {
     'boundary': 'lightgreen',
-    'business': 'red',
+    'business': 'magenta',
     'feasible': 'white',
     'green_l': 'green',
-    'hospital_l': 'blue',
-    'hospital_s': 'cyan',
-    'business_h': 'orange',
+    'hospital_l': 'red',
+    'hospital_s': 'darkred',
+    'business_h': 'deeppink',
     'outside': 'black',
     'residential': 'yellow',
-    'residential_h': 'brown',
+    'residential_h': 'gold',
     'road': 'blue',
     'school': 'darkorange',
-    'recreation': 'lavender',
+    'recreation': 'lightgreen',
 }

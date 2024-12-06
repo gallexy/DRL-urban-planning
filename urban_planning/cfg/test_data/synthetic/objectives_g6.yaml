@@ -1,0 +1,78 @@
+community:
+  name: grid3_concept
+  grid_cols: 2000
+  grid_rows: 2000
+  cell_edge_length: 1
+objectives:
+  land_use:
+    - residential
+    - residential_h
+    - business
+    - business_h
+    - green_l
+    - school
+    - hospital_l
+    - hospital_s
+    - recreation
+  ratio:
+    residential: 0.600
+  count:
+    business: 6
+    residential_h: 3
+    business_h: 4
+    green_l: 4
+    school: 4
+    hospital_l: 1
+    hospital_s: 3
+    recreation: 4
+constraints:
+  max_area:
+    residential: 40000
+    residential_h: 40000
+    green_l: 90000
+    hospital_l: 30000
+    business: 20000
+    business_h: 20000
+    school: 20000
+    hospital_s: 10000
+    recreation: 10000
+  min_area:
+    residential: 20000
+    residential_h: 20000
+    green_l: 15000
+    hospital_l: 10000
+    business: 10000
+    business_h: 10000
+    school: 10000
+    hospital_s: 2000
+    recreation: 500
+  max_edge_length:
+    residential: 600
+    residential_h: 600
+    green_l: 300
+    hospital_l: 200
+    business: 200
+    business_h: 200
+    school: 300
+    hospital_s: 150
+    recreation: 150
+  min_edge_length:
+    residential: 100
+    residential_h: 100
+    green_l: 100
+    hospital_l: 100
+    business: 100
+    business_h: 100
+    school: 80
+    hospital_s: 80
+    recreation: 80
+carbon_emissions:
+  residential: 248
+  residential_h: 345.9
+  business: 193
+  business_h: 906
+  green_l: 0
+  school: 321
+  hospital_l: 20
+  hospital_s: 18
+  recreation: 20
