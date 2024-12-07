@@ -1,7 +1,7 @@
 community:
   name: grid3_concept
-  grid_cols: 2000
-  grid_rows: 2000
+  grid_cols: 3000
+  grid_rows: 3000
   cell_edge_length: 1
 objectives:
   land_use:

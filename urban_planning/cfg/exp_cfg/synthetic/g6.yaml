@@ -1,6 +1,6 @@
 # env
-objectives_plan: objectives_grid3_concept
-init_plan: init_plan_grid3_concept
+objectives_plan: objectives_g6
+init_plan: init_plan_g6
 
 # reward
 reward_specs:
@@ -9,6 +9,7 @@ reward_specs:
   greenness_weight: 1.0
   concept_weight: 3.0
   carbon_emission_weight: 0.1
+  shaping_weight: 0.1
 
 
 

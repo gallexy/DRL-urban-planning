@@ -972,6 +972,17 @@ class PlanClient(object):
             return reward, info
         else:
             return 0.0, dict()
+    def get_shaping_reward(self) -> float:
+        """Get the reward of the shaping.
+
+        Returns:
+            The reward of the shaping.
+        """
+        gdf = self._gdf[self._gdf['existence'] == True]
+        gdf_poly = gdf[gdf['type'].isin(city_config.BLOCK_LAND_TYPE)]
+        shaping_reward = -gdf_poly[gdf_poly['rect']<1]['rect'].to_numpy().sum()
+
+        return shaping_reward
 
     def get_carbon_emission_reward(self) -> float:
         """Get the reward of the carbon emission.

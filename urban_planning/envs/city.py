@@ -42,7 +42,8 @@ def reward_info_function(
     life_circle_weight: float = 1.0,
     greenness_weight: float = 1.0,
     concept_weight: float = 0.0,
-    carbon_emission_weight: float = 0.0,
+    carbon_emission_weight: float = 0.1,
+    shaping_weight: float = 0.0,
     weight_by_area: bool = False) -> Tuple[float, Dict]:
     """Returns the RL reward and info.
 
@@ -70,6 +71,7 @@ def reward_info_function(
             'greenness': -1.0,
             'concept': -1.0,
             'carbon_emission': -1.0,
+            'shaping': -1.0
         }
     elif name == 'road':
         proxy_reward = 0.0
@@ -84,6 +86,7 @@ def reward_info_function(
             'greenness': -1.0,
             'concept': -1.0,
             'carbon_emission': -1.0,
+            'shaping': -1.0,
             'road_network_info': road_network_info
         }
     elif name == 'land_use':
@@ -92,6 +95,7 @@ def reward_info_function(
         greenness = -1.0
         concept = -1.0
         carbon_emission = -1.0
+        shaping = -1.0
 
         life_circle_info = dict()
         if life_circle_weight > 0.0:
@@ -101,6 +105,10 @@ def reward_info_function(
         if greenness_weight > 0.0:
             greenness = plc.get_greenness_reward()
             proxy_reward += greenness_weight * greenness
+
+        if shaping_weight > 0.0:
+            shaping = plc.get_shaping_reward()
+            proxy_reward += shaping_weight * shaping
 
         concept_info = dict()
         if concept_weight > 0.0:
@@ -120,6 +128,7 @@ def reward_info_function(
             'greenness': greenness,
             'concept': concept,
             'carbon_emission': carbon_emission,
+            'shaping': shaping,
             'life_circle_info': life_circle_info,
             'concept_info': concept_info
         }
@@ -149,6 +158,7 @@ class CityEnv:
                                        greenness_weight=cfg.reward_specs.get('greenness_weight', 1.0),
                                        concept_weight=cfg.reward_specs.get('concept_weight', 0.0),
                                        carbon_emission_weight=cfg.reward_specs.get('carbon_emission_weight', 0.0),
+                                       shaping_weight=cfg.reward_specs.get('shaping_weight', 0.0),
                                        weight_by_area=cfg.reward_specs.get('weight_by_area', False))
 
         self._all_stages = ['land_use', 'road', 'done']
@@ -195,6 +205,7 @@ class CityEnv:
             self._cached_greenness_reward = -1.0
             self._cached_concept_reward = -1.0
             self._cached_carbon_emission_reward = -1.0
+            self._cached_shaping_reward = -1.0
 
             self._cached_life_circle_info = dict()
             self._cached_concept_info = dict()
@@ -214,6 +225,7 @@ class CityEnv:
         self._cached_greenness_reward = info['greenness']
         self._cached_concept_reward = info['concept']
         self._cached_carbon_emission_reward = info['carbon_emission']
+        self._cached_shaping_reward = info['shaping']
         self._cached_life_circle_info = info['life_circle_info']
         self._cached_concept_info = info['concept_info']
         self._frozen = True
@@ -262,6 +274,7 @@ class CityEnv:
             'life_circle': land_use_info['life_circle'],
             'greenness': land_use_info['greenness'],
             'carbon_emission': land_use_info['carbon_emission'],
+            'shaping': land_use_info['shaping'],
             'road_network_info': road_info['road_network_info'],
             'life_circle_info': land_use_info['life_circle_info']
         }
@@ -433,6 +446,7 @@ class CityEnv:
             'life_circle': -1.0,
             'greenness': -1.0,
             'carbon_emission': -1.0,
+            'shaping': -1.0
         }
         return self._get_obs(), self.FAILURE_REWARD, True, info
 
@@ -495,6 +509,7 @@ class CityEnv:
                     self._cached_greenness_reward = info['greenness']
                     self._cached_concept_reward = info['concept']
                     self._cached_carbon_emission_reward = info['carbon_emission']
+                    self._cached_shaping_reward = info['shaping']
 
                     self._cached_life_circle_info = info['life_circle_info']
                     self._cached_concept_info = info['concept_info']
@@ -531,7 +546,7 @@ class CityEnv:
                 info['greenness'] = self._cached_greenness_reward
                 info['concept'] = self._cached_concept_reward
                 info['carbon_emission'] = self._cached_carbon_emission_reward
-
+                info['shaping'] = self._cached_shaping_reward
                 info['life_circle_info'] = self._cached_life_circle_info
                 info['concept_info'] = self._cached_concept_info
             else:
@@ -597,7 +612,7 @@ class CityEnv:
         Plot and save the gdf.
         """
         gdf = CityEnv._add_legend_to_gdf(gdf)
-        fig, ax = plt.subplots(figsize=(12, 8))
+        fig, ax = plt.subplots(figsize=(12, 12))
         ax.set_aspect('equal')
         gdf.plot(
             'legend',
