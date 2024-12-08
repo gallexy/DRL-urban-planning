@@ -958,7 +958,7 @@ class PlanClient(object):
             reference_distance = math.sqrt(self._grid_cols**2 + self._grid_rows**2)
             decentralization_reward = np.array(public_service_pairwise_distances).mean()/reference_distance
             utility_reward = public_service_area/self._community_area
-            reward = efficiency_reward + 0.05 * decentralization_reward
+            reward = efficiency_reward + 0.5 * decentralization_reward
             info = {'life_circle_15min': life_circle_15min.mean(),
                     'life_circle_10min': life_circle_10min.mean(),
                     'life_circle_5min': life_circle_5min.mean(),
@@ -981,6 +981,9 @@ class PlanClient(object):
         gdf = self._gdf[self._gdf['existence'] == True]
         gdf_poly = gdf[gdf['type'].isin(city_config.BLOCK_LAND_TYPE)]
         shaping_reward = -gdf_poly[gdf_poly['rect']<1]['rect'].to_numpy().sum()
+        gdf_rect= gdf_poly[gdf_poly['rect']==1]
+        abnormal_rect = (gdf_rect['sc']-1).sum()
+        shaping_reward += abnormal_rect/10
 
         return shaping_reward
 
