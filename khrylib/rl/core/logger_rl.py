@@ -9,7 +9,7 @@ class LoggerRL:
         self.num_steps = 0
         self.num_episodes = 0
         self.sample_time = 0
-        self.stats_names = ['episode_len', 'reward', 'episode_reward', 'road_network', 'life_circle', 'greenness', 'carbon_emission','shaping']
+        self.stats_names = ['episode_len', 'reward', 'episode_reward', 'road_network', 'life_circle', 'greenness', 'carbon_emission','shaping','concept']
         if init_stats_logger:
             self.stats_loggers = {x: StatsLogger(is_nparray=False) for x in self.stats_names}
         self.plans = []
@@ -33,6 +33,7 @@ class LoggerRL:
         self.stats_loggers['greenness'].log(info['greenness'])
         self.stats_loggers['carbon_emission'].log(info['carbon_emission'])
         self.stats_loggers['shaping'].log(info['shaping'])
+        self.stats_loggers['concept'].log(info['concept'])
 
     def add_plan(self, info_plan):
         self.plans.append(info_plan)
@@ -56,5 +57,6 @@ class LoggerRL:
         logger.avg_episode_greenness_reward = logger.stats_loggers['greenness'].avg()
         logger.avg_episode_carbon_emission_reward = logger.stats_loggers['carbon_emission'].avg()
         logger.avg_episode_shaping_reward = logger.stats_loggers['shaping'].avg()
+        logger.avg_episode_concept_reward = logger.stats_loggers['concept'].avg()
         logger.plans = list(itertools.chain(*[var.plans for var in logger_list]))
         return logger

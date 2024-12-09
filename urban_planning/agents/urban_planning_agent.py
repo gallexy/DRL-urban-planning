@@ -298,21 +298,11 @@ class UrbanPlanningAgent(AgentPPO):
         log_eval = self.eval_agent(num_samples=1, mean_action=True)
         t3 = time.time() 
 
-        # Calculate carbon emission after each training round
-        carbon_emission = self.calculate_carbon_emission(log_eval.plans)
-        log_eval.avg_episode_reward += carbon_emission
-
         info = {
             'log': log, 'log_eval': log_eval,
             'T_sample': t1 - t0, 'T_update': t2 - t1, 'T_eval': t3 - t2, 'T_total': t3 - t0
         }
         return info
-
-    def calculate_carbon_emission(self, plans):
-        # Implement the logic to calculate carbon emission based on the plans
-        carbon_emission = 0.0
-        # Add your code here to calculate carbon emission
-        return carbon_emission
 
     def update_params(self, batch, iteration):
         t0 = time.time()

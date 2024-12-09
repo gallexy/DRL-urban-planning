@@ -1,5 +1,5 @@
 community:
-  name: grid3_concept
+  name: g6
   grid_cols: 3000
   grid_rows: 3000
   cell_edge_length: 1
@@ -39,7 +39,7 @@ constraints:
   min_area:
     residential: 20000
     residential_h: 20000
-    green_l: 15000
+    green_l: 25000
     hospital_l: 10000
     business: 10000
     business_h: 10000
@@ -49,7 +49,7 @@ constraints:
   max_edge_length:
     residential: 600
     residential_h: 600
-    green_l: 300
+    green_l: 500
     hospital_l: 200
     business: 200
     business_h: 200
@@ -59,13 +59,13 @@ constraints:
   min_edge_length:
     residential: 100
     residential_h: 100
-    green_l: 100
+    green_l: 200
     hospital_l: 100
     business: 100
     business_h: 100
     school: 80
     hospital_s: 80
-    recreation: 80
+    recreation: 50
 carbon_emissions:
   residential: 248
   residential_h: 345.9

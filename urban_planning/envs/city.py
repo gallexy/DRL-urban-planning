@@ -275,8 +275,10 @@ class CityEnv:
             'greenness': land_use_info['greenness'],
             'carbon_emission': land_use_info['carbon_emission'],
             'shaping': land_use_info['shaping'],
+            'concept': land_use_info['concept'],
             'road_network_info': road_info['road_network_info'],
-            'life_circle_info': land_use_info['life_circle_info']
+            'life_circle_info': land_use_info['life_circle_info'],
+            'concept_info': land_use_info['concept_info']
         }
         return reward, info
 

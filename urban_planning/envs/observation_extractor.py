@@ -63,7 +63,8 @@ class ObservationExtractor:
         """
         pad = (0, max_num - mask.size)
         if pad[1] < 0:
-            raise ValueError('The number of {} exceeds the maximum limit.'.format(name))
+            print(mask)
+            raise ValueError('The number of {}:{} exceeds the maximum limit.'.format(name,mask.size))
         return np.pad(mask, pad, mode='constant', constant_values=False)
 
     def _pad_nodes(self, nodes: np.ndarray) -> np.ndarray:

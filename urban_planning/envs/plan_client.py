@@ -25,12 +25,12 @@ class PlanClient(object):
         city_config.HOSPITAL_L,
         city_config.SCHOOL,
         city_config.HOSPITAL_S,
-        city_config.RECREATION,
         city_config.RESIDENTIAL,
         city_config.RESIDENTIAL_H,
         city_config.GREEN_L,
         city_config.BUSINESS_H,
-        city_config.BUSINESS], dtype=np.int32)
+        city_config.BUSINESS,
+        city_config.RECREATION], dtype=np.int32)
     EPSILON = 1E-4
     DEG_TOL = 1
     SNAP_EPSILON = 1
