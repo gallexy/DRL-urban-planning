@@ -24,7 +24,7 @@ objectives:
     school: 4
     hospital_l: 1
     hospital_s: 3
-    recreation: 4
+    recreation: 3
 constraints:
   max_area:
     residential: 40000
@@ -45,7 +45,7 @@ constraints:
     business_h: 10000
     school: 10000
     hospital_s: 2000
-    recreation: 500
+    recreation: 100
   max_edge_length:
     residential: 600
     residential_h: 600
@@ -65,7 +65,7 @@ constraints:
     business_h: 100
     school: 80
     hospital_s: 80
-    recreation: 50
+    recreation: 10
 carbon_emissions:
   residential: 248
   residential_h: 345.9
