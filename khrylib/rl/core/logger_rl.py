@@ -33,7 +33,11 @@ class LoggerRL:
         self.stats_loggers['greenness'].log(info['greenness'])
         self.stats_loggers['carbon_emission'].log(info['carbon_emission'])
         self.stats_loggers['shaping'].log(info['shaping'])
-        self.stats_loggers['concept'].log(info['concept'])
+        if 'concept' in info:
+            self.stats_loggers['concept'].log(info['concept'])
+       
+        #print(info['concept'])
+        #print(self.stats_loggers['concept'])
 
     def add_plan(self, info_plan):
         self.plans.append(info_plan)

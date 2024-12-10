@@ -15,7 +15,7 @@ objectives:
     - hospital_s
     - recreation
   ratio:
-    residential: 0.600
+    residential: 0.700
   count:
     business: 6
     residential_h: 3

@@ -983,7 +983,7 @@ class PlanClient(object):
         shaping_reward = -gdf_poly[gdf_poly['rect']<1]['rect'].to_numpy().sum()
         gdf_rect= gdf_poly[gdf_poly['rect']==1]
         abnormal_rect = (gdf_rect['sc']-1).sum()
-        shaping_reward += abnormal_rect/10
+        shaping_reward += abnormal_rect/5
 
         return shaping_reward
 

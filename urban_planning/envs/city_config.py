@@ -112,6 +112,6 @@ TYPE_COLOR_MAP = {
     'residential': 'yellow',
     'residential_h': 'gold',
     'road': 'blue',
-    'school': 'darkorange',
+    'school': 'greenyellow',
     'recreation': 'lightgreen',
 }
