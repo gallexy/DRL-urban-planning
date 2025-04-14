@@ -14,7 +14,9 @@ BLOCK_LAND_USE = (
     'school',
     'hospital_l',
     'hospital_s',
-    'recreation'
+    'recreation',
+    'river',
+    'expressway'
 )
 
 LAND_USE = (
@@ -33,6 +35,8 @@ SCHOOL = 9
 HOSPITAL_L = 10
 HOSPITAL_S = 11
 RECREATION = 12
+RIVER = 13
+EXPRESSWAY = 14
 
 
 LAND_USE_ID = (
@@ -49,6 +53,8 @@ LAND_USE_ID = (
     HOSPITAL_L,
     HOSPITAL_S,
     RECREATION,
+    RIVER,
+    EXPRESSWAY,
 )
 
 BLOCK_LAND_TYPE = (
@@ -61,6 +67,8 @@ BLOCK_LAND_TYPE = (
     HOSPITAL_L,
     HOSPITAL_S,
     RECREATION,
+    RIVER,
+    EXPRESSWAY,
 )
 
 NUM_TYPES = len(LAND_USE_ID)
@@ -71,18 +79,18 @@ LAND_USE_ID_MAP = dict(
 LAND_USE_ID_MAP_INV = dict(
     zip(LAND_USE_ID, LAND_USE))
 
-INTERSECTION = 13
+INTERSECTION = 15
 
 RESIDENTIAL_ID = (
     RESIDENTIAL,
-    RESIDENTIAL_H
 )
 
 PUBLIC_SERVICES_ID = (
     BUSINESS,
     BUSINESS_H,
     SCHOOL,
-    (HOSPITAL_L, HOSPITAL_S),
+    HOSPITAL_L, 
+    HOSPITAL_S,
     RECREATION
 )
 
@@ -91,6 +99,7 @@ PUBLIC_SERVICES = (
     'working',
     'education',
     'medical care',
+    'hospital_s'
     'entertainment'
 )
 
@@ -98,20 +107,22 @@ GREEN_ID = (
     GREEN_L,
     RECREATION
 )
-GREEN_AREA_THRESHOLD = 2000
+GREEN_AREA_THRESHOLD = 5000
 
 TYPE_COLOR_MAP = {
     'boundary': 'lightgreen',
-    'business': 'magenta',
+    'business': '#e6005c',   # pink
     'feasible': 'white',
-    'green_l': 'green',
-    'hospital_l': 'red',
-    'hospital_s': 'darkred',
-    'business_h': 'deeppink',
+    'green_l': '#00ff00',
+    'hospital_l': '#ff7f7e',    # light red
+    'hospital_s': '#FF7F00',
+    'business_h': '#ff0000',    # red
     'outside': 'black',
-    'residential': 'yellow',
-    'residential_h': 'gold',
-    'road': 'blue',
-    'school': 'greenyellow',
-    'recreation': 'lightgreen',
+    'residential': '#ffff2d',  # yellow
+    'residential_h': '#8B4513',   # brown
+    'road': '#a3a3a3',      # grey
+    'school': '#ff85c9',   # light pink
+    'recreation': '#acffcf',   # light blue
+    'river': '#4682B4',   # blue
+    'expressway': 'gray',   # dark blue
 }

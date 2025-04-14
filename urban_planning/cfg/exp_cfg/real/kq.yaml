@@ -1,15 +1,15 @@
 # env
-objectives_plan: objectives_g6
-init_plan: init_plan_g6
+objectives_plan: objectives_kq
+init_plan: init_plan_kq
 
 # reward
 reward_specs:
   road_network_weight: 1.0
   life_circle_weight: 4.0
   greenness_weight: 1.0
-  concept_weight: 3.0
+  concept_weight: 0.0
   carbon_emission_weight: 0.1
-  shaping_weight: 0.2
+  shaping_weight: 0.0
 
 
 
@@ -29,7 +29,7 @@ state_encoder_specs:
   num_gcn_layers: 2
   num_edge_fc_layers: 1
   max_num_nodes: 1000
-  max_num_edges: 3300
+  max_num_edges: 5000
   num_attention_heads: 1
 policy_specs:
   policy_land_use_head_hidden_size: [32, 1]
@@ -42,8 +42,8 @@ eps: 1.0e-5
 value_pred_coef: 0.5
 entropy_coef: 0.01
 clip_epsilon: 0.2
-max_num_iterations: 200
-num_episodes_per_iteration: 500
+max_num_iterations: 100
+num_episodes_per_iteration: 100
 max_sequence_length: 120
 num_optim_epoch: 4
 mini_batch_size: 256

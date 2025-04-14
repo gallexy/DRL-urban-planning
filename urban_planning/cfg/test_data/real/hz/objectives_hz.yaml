@@ -1,7 +1,7 @@
 community:
-  name: g6
-  grid_cols: 3000
-  grid_rows: 3000
+  name: hz
+  grid_cols: 2640
+  grid_rows: 2380
   cell_edge_length: 1
 objectives:
   land_use:
@@ -15,23 +15,22 @@ objectives:
     - hospital_s
     - recreation
   ratio:
-    residential: 0.600
+    residential_h: 0.400
+    residential: 0.200
   count:
     business: 2
-    residential_h: 3
     business_h: 3
     green_l: 3
-    school: 3
+    school: 2
     hospital_l: 1
-    hospital_s: 3
-    recreation: 3
+    hospital_s: 2
 constraints:
   max_area:
-    residential: 250000
-    residential_h: 50000
-    green_l: 60000
-    hospital_l: 250000
-    business: 60000
+    residential: 40000
+    residential_h: 40000
+    green_l: 100000
+    hospital_l: 30000
+    business: 20000
     business_h: 20000
     school: 20000
     hospital_s: 10000
@@ -39,7 +38,7 @@ constraints:
   min_area:
     residential: 20000
     residential_h: 20000
-    green_l: 25000
+    green_l: 1000
     hospital_l: 10000
     business: 10000
     business_h: 10000
@@ -47,15 +46,15 @@ constraints:
     hospital_s: 2000
     recreation: 100
   max_edge_length:
-    residential: 500
-    residential_h: 500
-    green_l: 500
-    hospital_l: 500
-    business: 300
-    business_h: 300
+    residential: 800
+    residential_h: 800
+    green_l: 800
+    hospital_l: 200
+    business: 200
+    business_h: 200
     school: 300
-    hospital_s: 250
-    recreation: 250
+    hospital_s: 150
+    recreation: 150
   min_edge_length:
     residential: 100
     residential_h: 100
@@ -65,7 +64,7 @@ constraints:
     business_h: 100
     school: 80
     hospital_s: 80
-    recreation: 10
+    recreation: 40
 carbon_emissions:
   residential: 248
   residential_h: 345.9

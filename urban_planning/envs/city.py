@@ -120,7 +120,7 @@ def reward_info_function(
             # Normalize carbon emission values to the same scale as other rewards (0-1)
             #max_carbon_emission = max(carbon_emission_coefficients.values())
             #normalized_carbon_emission = carbon_emission / 100000  #10wan吨
-            proxy_reward -= carbon_emission_weight * carbon_emission
+            proxy_reward += carbon_emission_weight * carbon_emission
 
         return proxy_reward, {
             'road_network': -1.0,
@@ -145,7 +145,7 @@ class CityEnv:
                  cfg: Config,
                  is_eval: bool = False,
                  reward_info_fn:
-                 Callable[[PlanClient, Text, float, float, float, bool], Tuple[float, Dict]] = reward_info_function):
+                 Callable[[PlanClient, Text, float, float, float, float, float, float, bool], Tuple[float, Dict]] = reward_info_function):
         self.cfg = cfg
         self._is_eval = is_eval
         self._frozen = False
@@ -268,7 +268,8 @@ class CityEnv:
         """
         land_use_reward, land_use_info = self._reward_info_fn(self._plc, 'land_use')
         road_reward, road_info = self._reward_info_fn(self._plc, 'road')
-        reward = land_use_reward + road_reward
+        #reward = land_use_reward + road_reward
+        reward = land_use_reward
         info = {
             'road_network': road_info['road_network'],
             'life_circle': land_use_info['life_circle'],
@@ -485,9 +486,12 @@ class CityEnv:
             try:
                 self.place_land_use(land_use, action)
             except ValueError as err:
+
                 logger.error(err)
-                return self.failure_step('Actions took before failing to place land use', logger)
+                return self.failure_step('valueError when failing to place land use', logger)
             except Exception as err:
+                import traceback
+                traceback.print_exc()
                 logger.error(err)
                 return self.failure_step('Actions took before failing to place land use', logger)
 
@@ -621,6 +625,7 @@ class CityEnv:
             cmap=cmap,
             categorical=True,
             legend=legend,
+            aspect=1,
             legend_kwds={'bbox_to_anchor': (1.8, 1)},
             ax=ax
         )
@@ -646,6 +651,69 @@ class CityEnv:
         cmap = ListedColormap(
             [city_config.TYPE_COLOR_MAP[var] for var in existing_types])
         self.plot_and_save_gdf(land_use_road_gdf, cmap, save_fig, path, legend, ticks, bbox)
+
+    def visualize_xlegend(self, legend_aliases: Dict[str, str] = None, save_fig: bool = False, 
+                        path: Text = None, legend: bool = True, ticks: bool = True, 
+                        bbox: bool = True) -> None:
+        """
+        Visualize the city plan with custom legend aliases.
+        
+        Args:
+            legend_aliases: Dictionary mapping original land use types to display aliases.
+                            For example, {'hospital_s': 'a2'}
+            save_fig: Whether to save the figure.
+            path: Path to save the figure.
+            legend: Whether to show the legend.
+            ticks: Whether to show the ticks.
+            bbox: Whether to show the bounding box.
+        """
+        # 获取并过滤GeoDataFrame
+        gdf = self._plc.get_gdf()
+        land_use_road_gdf = self.filter_land_use_road(gdf)
+        
+        # 获取原始类型及其颜色
+        existing_types = sorted([city_config.LAND_USE_ID_MAP_INV[var] for var in land_use_road_gdf['type'].unique()])
+        cmap = ListedColormap([city_config.TYPE_COLOR_MAP[var] for var in existing_types])
+        
+        # 创建图形和坐标轴
+        fig, ax = plt.subplots(figsize=(12, 12))
+        ax.set_aspect('equal')
+        
+        # 绘制地理数据，但不显示自动生成的图例
+        land_use_road_gdf = self._add_legend_to_gdf(land_use_road_gdf)
+        land_use_road_gdf.plot(
+            'legend',
+            cmap=cmap,
+            categorical=True,
+            legend=False,
+            ax=ax
+        )
+        
+        # 如果需要图例，手动创建一个包含别名的图例
+        if legend:
+            from matplotlib.patches import Patch
+            legend_elements = []
+            
+            for original_type in existing_types:
+                color = city_config.TYPE_COLOR_MAP[original_type]
+                # 使用别名（如果有）或原始名称
+                display_name = legend_aliases.get(original_type, original_type) if legend_aliases else original_type
+                legend_elements.append(
+                    Patch(facecolor=color, edgecolor='black', label=display_name)
+                )
+            
+            ax.legend(handles=legend_elements, bbox_to_anchor=(1.8, 1))
+        
+        if not ticks:
+            plt.xticks([])
+            plt.yticks([])
+        if not bbox:
+            plt.axis('off')
+        if save_fig:
+            assert path is not None
+            plt.savefig(path, format='svg', transparent=True)
+        plt.show()
+        plt.close()
 
     def visualize_road_and_boundary(self, save_fig: bool = False, path: Text = None, legend: bool = True,
                                     ticks: bool = True, bbox: bool = True) -> None:

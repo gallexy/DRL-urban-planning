@@ -1,6 +1,6 @@
 # env
-objectives_plan: objectives_g6
-init_plan: init_plan_g6
+objectives_plan: objectives_grid3_concept
+init_plan: init_plan_grid3_concept
 
 # reward
 reward_specs:
@@ -9,7 +9,6 @@ reward_specs:
   greenness_weight: 1.0
   concept_weight: 3.0
   carbon_emission_weight: 0.1
-  shaping_weight: 0.2
 
 
 
@@ -29,14 +28,14 @@ state_encoder_specs:
   num_gcn_layers: 2
   num_edge_fc_layers: 1
   max_num_nodes: 1000
-  max_num_edges: 3300
+  max_num_edges: 3000
   num_attention_heads: 1
 policy_specs:
   policy_land_use_head_hidden_size: [32, 1]
   policy_road_head_hidden_size: [32, 1]
 value_specs:
   value_head_hidden_size: [32, 32, 1]
-lr: 8.0e-4
+lr: 4.0e-4
 weightdecay: 0.0
 eps: 1.0e-5
 value_pred_coef: 0.5

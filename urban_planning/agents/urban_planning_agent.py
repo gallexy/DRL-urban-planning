@@ -116,16 +116,17 @@ class UrbanPlanningAgent(AgentPPO):
                 memories = [None] * nthreads
                 loggers = [None] * nthreads
                 workers = []  # 用于存储子进程
-                for i in range(nthreads-1):
-                    worker_args = (i+1, queue, thread_num_samples, mean_action, policy_state_dict)
+                for i in range(nthreads):
+                    worker_args = (i, queue, thread_num_samples, mean_action, policy_state_dict)
                     worker = multiprocessing.Process(target=self.sample_worker, args=worker_args)
                     worker.start()
                     workers.append(worker) 
-                memories[0], loggers[0] = self.sample_worker(0, None, thread_num_samples, mean_action, policy_state_dict)
+                # memories[0], loggers[0] = self.sample_worker(0, None, thread_num_samples, mean_action, policy_state_dict)
 
-                for i in range(nthreads - 1):
+                for i in range(nthreads):
                     try:
                         #pid, worker_memory, worker_logger = queue.get(timeout=100)
+                        
                         pid, worker_memory, worker_logger = queue.get()
                         memories[pid] = worker_memory
                         loggers[pid] = worker_logger

@@ -7,6 +7,7 @@ import math
 import momepy
 import networkx as nx
 import pandas as pd
+import geopandas as gpd
 from geopandas import GeoSeries, GeoDataFrame
 import numpy as np
 from scipy.spatial.distance import cdist
@@ -14,7 +15,7 @@ from shapely.geometry import Polygon, Point, MultiPolygon, MultiPoint, LineStrin
 from shapely.ops import snap, polygonize
 
 from urban_planning.envs import city_config
-from khrylib.utils import load_yaml, load_pickle, simplify_by_angle, simplify_by_distance, get_boundary_edges, \
+from khrylib.utils import load_yaml, load_pickle, load_geojson, simplify_by_angle, simplify_by_distance, get_boundary_edges, \
     slice_polygon_from_edge, slice_polygon_from_corner, get_intersection_polygon_with_maximum_area
 from khrylib.utils import set_land_use_array_from_dict
 
@@ -31,7 +32,7 @@ class PlanClient(object):
         city_config.BUSINESS_H,
         city_config.BUSINESS,
         city_config.RECREATION], dtype=np.int32)
-    EPSILON = 1E-4
+    EPSILON = 1
     DEG_TOL = 1
     SNAP_EPSILON = 1
 
@@ -44,8 +45,11 @@ class PlanClient(object):
         """
         file_path = 'urban_planning/cfg/**/{}.yaml'.format(objectives_plan_file)
         self.objectives = load_yaml(file_path)
-        file_path = 'urban_planning/cfg/**/{}.pickle'.format(init_plan_file)
-        self.init_plan = load_pickle(file_path)
+        #file_path = 'urban_planning/cfg/**/{}.pickle'.format(init_plan_file)
+        #self.init_plan = load_pickle(file_path)
+        #load initial plan from geojson file directly
+        file_path = 'urban_planning/cfg/**/{}.geojson'.format(init_plan_file)
+        self.init_plan = load_geojson(file_path)
         self.init_objectives()
         self.init_constraints()
         self.init_carbon()
@@ -264,6 +268,10 @@ class PlanClient(object):
         done = ratio_satisfication and count_satisfication
         return done
 
+    def get_ratio_satisfication(self):
+        """Get the ratio satisfication."""
+        ratio_satisfication = (self._plan_ratio - self._required_plan_ratio >= -self.EPSILON)[self._plan_order]
+        return ratio_satisfication
     def get_gdf(self) -> GeoDataFrame:
         """Return the current GDF."""
         return self._gdf
@@ -1002,7 +1010,9 @@ class PlanClient(object):
         #为其他类型地块同样处理
         for land_type in self._carbon_emission_dict.keys():
             land_use_area = gdf[gdf['type'] == land_type].area.to_numpy()
-            reward += np.sum(land_use_area)/10000 * self._carbon_emission_dict[land_type]/10000  
+            tmp_reward = -(np.sum(land_use_area)/10000 * self._carbon_emission_dict[land_type]/10000)
+            reward += tmp_reward
+
             #碳排放单位为10000吨
         return reward
 

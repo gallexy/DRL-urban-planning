@@ -1,15 +1,15 @@
 # env
-objectives_plan: objectives_g6
-init_plan: init_plan_g6
+objectives_plan: objectives_hz
+init_plan: init_plan_hz
 
 # reward
 reward_specs:
   road_network_weight: 1.0
   life_circle_weight: 4.0
   greenness_weight: 1.0
-  concept_weight: 3.0
+  concept_weight: 0.0
   carbon_emission_weight: 0.1
-  shaping_weight: 0.2
+  shaping_weight: 0.1
 
 
 
