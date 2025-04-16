@@ -1,0 +1,24 @@
+{
+"type": "FeatureCollection",
+"crs": {
+    "type": "name",
+    "properties": {
+      "name": "EPSG:3857"
+    }
+  },
+"features": [
+{ "type": "Feature", "properties": { "id": 1, "type": 13, "existence": true }, "geometry": { "type": "Point", "coordinates": [ 0.0, 0.0 ] } },
+{ "type": "Feature", "properties": { "id": 2, "type": 13, "existence": true }, "geometry": { "type": "Point", "coordinates": [ 1000.0, 0.0 ] } },
+{ "type": "Feature", "properties": { "id": 3, "type": 13, "existence": true }, "geometry": { "type": "Point", "coordinates": [ 1000.0, 1000.0 ] } },
+{ "type": "Feature", "properties": { "id": 4, "type": 13, "existence": true }, "geometry": { "type": "Point", "coordinates": [ 0.0, 1000.0 ] } },
+{ "type": "Feature", "properties": { "id": 9, "type": 1, "existence": true }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 0.0, 0.0 ], [ 1000.0, 0.0 ], [ 1000.0, 1000.0 ], [ 0.0, 1000.0 ], [ 0.0, 0.0 ] ] ] } },
+{ "type": "Feature", "properties": { "id": 12, "type": 13, "existence": true }, "geometry": { "type": "Point", "coordinates": [ 1000.0, 2000.0 ] } },
+{ "type": "Feature", "properties": { "id": 13, "type": 13, "existence": true }, "geometry": { "type": "Point", "coordinates": [ 0.0, 2000.0 ] } },
+{ "type": "Feature", "properties": { "id": 18, "type": 1, "existence": true }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 0.0, 1000.0 ], [ 1000.0, 1000.0 ], [ 1000.0, 2000.0 ], [ 0.0, 2000.0 ], [ 0.0, 1000.0 ] ] ] } },
+{ "type": "Feature", "properties": { "id": 20, "type": 13, "existence": true }, "geometry": { "type": "Point", "coordinates": [ 2000.0, 0.0 ] } },
+{ "type": "Feature", "properties": { "id": 21, "type": 13, "existence": true }, "geometry": { "type": "Point", "coordinates": [ 2000.0, 1000.0 ] } },
+{ "type": "Feature", "properties": { "id": 27, "type": 1, "existence": true }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 1000.0, 0.0 ], [ 2000.0, 0.0 ], [ 2000.0, 1000.0 ], [ 1000.0, 1000.0 ], [ 1000.0, 0.0 ] ] ] } },
+{ "type": "Feature", "properties": { "id": 30, "type": 13, "existence": true }, "geometry": { "type": "Point", "coordinates": [ 2000.0, 2000.0 ] } },
+{ "type": "Feature", "properties": { "id": 36, "type": 1, "existence": true }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 1000.0, 1000.0 ], [ 2000.0, 1000.0 ], [ 2000.0, 2000.0 ], [ 1000.0, 2000.0 ], [ 1000.0, 1000.0 ] ] ] } }
+]
+}

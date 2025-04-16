@@ -10,20 +10,24 @@ objectives:
     - business
     - business_h
     - green_l
+    - a2
+    - a3
+    - a5
+    - s1
     - school
     - hospital_l
     - hospital_s
     - recreation
   ratio:
-    residential: 0.400
+    residential: 0.300
   count:
+    residential: 20
     business: 6
-    business_h: 4
     green_l: 10
-    school: 3
-    hospital_l: 3
-    hospital_s: 4
-    recreation: 5
+    a3: 3
+    a5: 3
+    a2: 8
+    s1: 5
 constraints:
   max_area:
     residential: 90000
@@ -35,6 +39,10 @@ constraints:
     school: 20000
     hospital_s: 90000
     recreation: 90000
+    a2: 90000
+    a3: 90000
+    a5: 90000
+    s1: 20000
   min_area:
     residential: 20000
     residential_h: 20000
@@ -42,6 +50,10 @@ constraints:
     hospital_l: 10000
     business: 10000
     business_h: 10000
+    a2: 10000
+    a3: 10000
+    a5: 10000
+    s1: 100
     school: 10000
     hospital_s: 2000
     recreation: 100
@@ -51,6 +63,10 @@ constraints:
     green_l: 800
     hospital_l: 500
     business: 500
+    a2: 500
+    a3: 500
+    a5: 500
+    s1: 500
     business_h: 300
     school: 300
     hospital_s: 300
@@ -60,20 +76,28 @@ constraints:
     residential_h: 100
     green_l: 200
     hospital_l: 100
+    a2: 100
+    a3: 100
+    a5: 100
+    s1: 40
     business: 100
     business_h: 100
     school: 80
     hospital_s: 80
     recreation: 40
 carbon_emissions:
-  residential: 248
+  residential: 346
   residential_h: 845.9
   business: 193
   business_h: 906
   green_l: 0
   river: 0
   school: 321
-  hospital_l: 20
-  hospital_s: 18
-  recreation: 20
+  hospital_l: 773.8
+  hospital_s: 20
+  recreation: 18.9
   expressway: 100
+  br: 346
+  a2: 18.9
+  a3: 321
+  s1: 50

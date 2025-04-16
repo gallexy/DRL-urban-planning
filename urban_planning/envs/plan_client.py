@@ -23,14 +23,13 @@ from khrylib.utils import set_land_use_array_from_dict
 class PlanClient(object):
     """Defines the PlanClient class."""
     PLAN_ORDER = np.array([
-        city_config.HOSPITAL_L,
-        city_config.SCHOOL,
-        city_config.HOSPITAL_S,
+        city_config.A5,
+        city_config.A3,
+        city_config.A2,
         city_config.RESIDENTIAL,
-        city_config.RESIDENTIAL_H,
-        city_config.GREEN_L,
-        city_config.BUSINESS_H,
         city_config.BUSINESS,
+        city_config.S1,
+        city_config.GREEN_L,
         city_config.RECREATION], dtype=np.int32)
     EPSILON = 1
     DEG_TOL = 1

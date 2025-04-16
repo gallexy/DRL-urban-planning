@@ -16,7 +16,13 @@ BLOCK_LAND_USE = (
     'hospital_s',
     'recreation',
     'river',
-    'expressway'
+    'expressway',
+    'a2',
+    'a3',
+    'a5',
+    'rb',
+    's1',
+    'industry' 
 )
 
 LAND_USE = (
@@ -37,6 +43,12 @@ HOSPITAL_S = 11
 RECREATION = 12
 RIVER = 13
 EXPRESSWAY = 14
+A2 = 15
+A3 = 16
+A5 = 17
+RB = 18
+S1 = 19
+INDUSTRY = 20
 
 
 LAND_USE_ID = (
@@ -55,6 +67,12 @@ LAND_USE_ID = (
     RECREATION,
     RIVER,
     EXPRESSWAY,
+    A2,
+    A3,
+    A5,
+    RB,
+    S1,
+    INDUSTRY,
 )
 
 BLOCK_LAND_TYPE = (
@@ -69,6 +87,12 @@ BLOCK_LAND_TYPE = (
     RECREATION,
     RIVER,
     EXPRESSWAY,
+    A2,
+    A3,
+    A5,
+    RB,
+    S1,
+    INDUSTRY,
 )
 
 NUM_TYPES = len(LAND_USE_ID)
@@ -79,10 +103,12 @@ LAND_USE_ID_MAP = dict(
 LAND_USE_ID_MAP_INV = dict(
     zip(LAND_USE_ID, LAND_USE))
 
-INTERSECTION = 15
+INTERSECTION = 21
 
 RESIDENTIAL_ID = (
     RESIDENTIAL,
+    RESIDENTIAL_H,
+    RB
 )
 
 PUBLIC_SERVICES_ID = (
@@ -91,7 +117,11 @@ PUBLIC_SERVICES_ID = (
     SCHOOL,
     HOSPITAL_L, 
     HOSPITAL_S,
-    RECREATION
+    RECREATION,
+    A2,
+    A3,
+    A5,
+    S1
 )
 
 PUBLIC_SERVICES = (
@@ -99,8 +129,8 @@ PUBLIC_SERVICES = (
     'working',
     'education',
     'medical care',
-    'hospital_s'
-    'entertainment'
+    'hospital_s',
+    'entertainment',
 )
 
 GREEN_ID = (
@@ -120,9 +150,15 @@ TYPE_COLOR_MAP = {
     'outside': 'black',
     'residential': '#ffff2d',  # yellow
     'residential_h': '#8B4513',   # brown
-    'road': '#a3a3a3',      # grey
+    'road': '#aaaaaa',      
     'school': '#ff85c9',   # light pink
     'recreation': '#acffcf',   # light blue
     'river': '#4682B4',   # blue
     'expressway': 'gray',   # dark blue
+    'a2': '#FF7F00',   # light green
+    'a3': '#FF85C9',   # light blue
+    'a5': '#BB7F7E',   # light red
+    's1': '#303030',   # dark gray
+    'rb': '#FFA500',   # orange red
+    'industry': '#8B4513',   # brown
 }

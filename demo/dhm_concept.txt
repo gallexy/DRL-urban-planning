@@ -1,0 +1,31 @@
+gdf:      type  existence                                           geometry
+id                                                                     
+0       2       True            LINESTRING (0.000 0.000, 432.000 0.000)
+1       2       True         LINESTRING (432.000 0.000, 1224.000 0.000)
+2       2       True        LINESTRING (1224.000 0.000, 1867.000 0.000)
+3       2       True        LINESTRING (0.000 2768.000, 0.000 2414.000)
+4       2       True        LINESTRING (0.000 2414.000, 0.000 1932.000)
+..    ...        ...                                                ...
+264     1       True  POLYGON ((1545.000 1785.000, 1457.000 1785.000...
+265     1       True  POLYGON ((1618.000 1694.000, 1545.000 1785.000...
+266     1       True  POLYGON ((1618.000 1303.000, 1513.000 1303.000...
+267     1       True  POLYGON ((573.000 1122.000, 573.000 1322.000, ...
+268     1       True  POLYGON ((933.000 1122.000, 753.000 1122.000, ...
+
+[269 rows x 3 columns]
+concept: [{'type': 'center', 'geometry': <shapely.geometry.point.Point object at 0x7fe19f66cdf0>, 'distance': 200, 'land_use': [5, 6]}, 
+{'type': 'axis', 'geometry': <shapely.geometry.linestring.LineString object at 0x7fe19f6290d0>, 'distance': 50, 'land_use': [12]}, 
+{'type': 'axis', 'geometry': <shapely.geometry.linestring.LineString object at 0x7fe19f66ce80>, 'distance': 50, 'land_use': [7, 8]}]
+
+'concept': [{'distance': 200,
+              'geometry': <shapely.geometry.point.Point object at 0x7fe19f619130>,
+              'land_use': [5, 6],
+              'type': 'center'},  bounds(1224,942,1224,942)
+             {'distance': 50,
+              'geometry': <shapely.geometry.linestring.LineString object at 0x7fe19f619af0>,
+              'land_use': [12],
+              'type': 'axis'},  (377.5,1858.5,1224.0,1858.5)
+             {'distance': 50,
+              'geometry': <shapely.geometry.linestring.LineString object at 0x7fe19f619400>,
+              'land_use': [7, 8],
+              'type': 'axis'}],  (185.5,2349.0,842,2349)
