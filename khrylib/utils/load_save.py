@@ -24,3 +24,13 @@ def load_pickle(file_path):
     assert(len(files) == 1)
     data = pickle.load(open(files[0], 'rb'))
     return data
+
+def load_geojson(file_path):
+    import geopandas as gpd
+    file_path = get_file_path(file_path)
+    files = glob.glob(file_path, recursive=True)
+    assert(len(files) == 1)
+    gdf_init = gpd.read_file(files[0])
+    data = dict()
+    data['gdf'] = gdf_init
+    return data

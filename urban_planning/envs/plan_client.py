@@ -149,9 +149,9 @@ class PlanClient(object):
 
     def _add_domain_features(self) -> None:
         """Adds domain features to the gdf."""
-        self._gdf['rect'] = momepy.Rectangularity(self._gdf[self._gdf.geom_type == 'Polygon']).series
-        self._gdf['eqi'] = momepy.EquivalentRectangularIndex(self._gdf[self._gdf.geom_type == 'Polygon']).series
-        self._gdf['sc'] = momepy.SquareCompactness(self._gdf[self._gdf.geom_type == 'Polygon']).series
+        self._gdf['rect'] = momepy.rectangularity(self._gdf[self._gdf.geom_type == 'Polygon'])
+        self._gdf['eqi'] = momepy.equivalent_rectangular_index(self._gdf[self._gdf.geom_type == 'Polygon'])
+        self._gdf['sc'] = momepy.square_compactness(self._gdf[self._gdf.geom_type == 'Polygon'])
 
     def get_init_plan(self) -> Dict:
         """Returns the initial plan."""
@@ -303,11 +303,11 @@ class PlanClient(object):
             filtered_blocks_id: filtered blocks.
         """
         if land_use_type == city_config.SCHOOL:
-            hospital_l = gdf[gdf['type'] == city_config.HOSPITAL_L].unary_union
+            hospital_l = gdf[gdf['type'] == city_config.HOSPITAL_L].geometry.union_all()
             near_hospital_l = gdf[(gdf.geom_type == 'Polygon') & (gdf.intersects(hospital_l))].index.to_numpy()
             filtered_blocks_id = np.setdiff1d(feasible_blocks_id, near_hospital_l)
         elif land_use_type == city_config.HOSPITAL_S:
-            school = gdf[(gdf['type'] == city_config.SCHOOL) | (gdf['type'] == city_config.HOSPITAL_L) | (gdf['type'] == city_config.HOSPITAL_S)].unary_union
+            school = gdf[(gdf['type'] == city_config.SCHOOL) | (gdf['type'] == city_config.HOSPITAL_L) | (gdf['type'] == city_config.HOSPITAL_S)].geometry.union_all()
             near_school = gdf[(gdf.geom_type == 'Polygon') & (gdf.intersects(school))].index.to_numpy()
             filtered_blocks_id = np.setdiff1d(feasible_blocks_id, near_school)
         else:
@@ -445,7 +445,7 @@ class PlanClient(object):
         search_min_area = self._required_min_area[land_use_type]
         polygon, polygon_boundary, relation, edges, distance = self._simplify_polygon(polygon, intersection)
         gdf = self._current_gdf
-        all_intersections = gdf[gdf.geom_type == 'Point']
+        all_intersections = gdf[(self._gdf['existence'] == True) & (self._gdf.geom_type == 'Point')].geometry.union_all()
         min_edge_length = self._required_min_edge_length[land_use_type]
         max_edge_length = self._required_max_edge_length[land_use_type]
         if relation == 'edge':
@@ -477,7 +477,7 @@ class PlanClient(object):
             feasible_polygon: feasible polygon.
             land_use_polygon: land use polygon.
         """
-        intersections = self._gdf[(self._gdf['existence'] == True) & (self._gdf.geom_type == 'Point')].unary_union
+        intersections = self._gdf[(self._gdf['existence'] == True) & (self._gdf.geom_type == 'Point')].geometry.union_all()
         feasible_polygon = snap(feasible_polygon, intersections, self.SNAP_EPSILON/self._cell_edge_length)
         remaining_feasibles = feasible_polygon.difference(land_use_polygon)
 
@@ -515,7 +515,7 @@ class PlanClient(object):
         polygon = simplify_by_distance(polygon, self.EPSILON)
         cached_polygon_simplify_distance = polygon
         existing_intersections = self._gdf[
-            (self._gdf.geom_type == 'Point') & (self._gdf['existence'] == True)].unary_union
+            (self._gdf.geom_type == 'Point') & (self._gdf['existence'] == True)].geometry.union_all()
         polygon = snap(polygon, existing_intersections, self.SNAP_EPSILON/self._cell_edge_length)
         if polygon.is_empty:
             return None, None, None
@@ -558,7 +558,8 @@ class PlanClient(object):
         for new_intersection in new_intersections:
             intersection_gdf = GeoDataFrame(
                 [[self._counter(), city_config.INTERSECTION, True, new_intersection]],
-                columns=['id', 'type', 'existence', 'geometry']).set_index('id')
+                columns=['id', 'type', 'existence', 'geometry'], 
+                crs=self._gdf.crs).set_index('id')
             self._gdf = pd.concat([self._gdf, intersection_gdf])
             roads_or_boundaries = self._gdf[(self._gdf.geom_type == 'LineString') & (self._gdf['existence'] == True)]
             within_existing_roads_or_boundaries = roads_or_boundaries.distance(new_intersection) < self.EPSILON
@@ -579,7 +580,8 @@ class PlanClient(object):
                 road_or_boundary_gdf = GeoDataFrame(
                     [[self._counter(), road_or_boundary_to_split_type, True, road_or_boundary_1],
                      [self._counter(), road_or_boundary_to_split_type, True, road_or_boundary_2]],
-                    columns=['id', 'type', 'existence', 'geometry']).set_index('id')
+                    columns=['id', 'type', 'existence', 'geometry'],
+                    crs=self._gdf.crs).set_index('id')
                 self._gdf = pd.concat([self._gdf, road_or_boundary_gdf])
                 road_or_boundary_to_split_id = road_or_boundary_to_split.index[0]
                 self._gdf.at[road_or_boundary_to_split_id, 'existence'] = False
@@ -593,7 +595,7 @@ class PlanClient(object):
         """
         new_boundaries = get_boundary_edges(land_use_polygon, 'MultiLineString')
         roads_or_boundaries = self._gdf[(self._gdf.geom_type == 'LineString')
-                                        & (self._gdf['existence'] == True)].unary_union
+                                        & (self._gdf['existence'] == True)].geometry.union_all()
         new_boundaries = new_boundaries.difference(roads_or_boundaries)
         if new_boundaries.is_empty:
             new_boundaries = []
@@ -612,7 +614,8 @@ class PlanClient(object):
                 raise ValueError(error_msg + '\nNumber of coords of new boundary is greater than 2.')
             boundary_gdf = GeoDataFrame(
                 [[self._counter(), city_config.BOUNDARY, True, new_boundary]],
-                columns=['id', 'type', 'existence', 'geometry']).set_index('id')
+                columns=['id', 'type', 'existence', 'geometry'],
+                crs=self._gdf.crs).set_index('id')
             self._gdf = pd.concat([self._gdf, boundary_gdf])
 
     def _add_land_use_polygon(self, land_use_polygon: Polygon, land_use_type: int) -> None:
@@ -624,10 +627,11 @@ class PlanClient(object):
         """
         land_use_gdf = GeoDataFrame(
             [[self._counter(), land_use_type, True, land_use_polygon]],
-            columns=['id', 'type', 'existence', 'geometry']).set_index('id')
-        land_use_gdf['rect'] = momepy.Rectangularity(land_use_gdf).series
-        land_use_gdf['eqi'] = momepy.EquivalentRectangularIndex(land_use_gdf).series
-        land_use_gdf['sc'] = momepy.SquareCompactness(land_use_gdf).series
+            columns=['id', 'type', 'existence', 'geometry'],
+            crs=self._gdf.crs).set_index('id')
+        land_use_gdf['rect'] = momepy.rectangularity(land_use_gdf)
+        land_use_gdf['eqi'] = momepy.equivalent_rectangular_index(land_use_gdf)
+        land_use_gdf['sc'] = momepy.square_compactness(land_use_gdf)
         self._gdf = pd.concat([self._gdf, land_use_gdf])
 
     def _update_gdf_without_building_boundaries(self,
@@ -933,7 +937,7 @@ class PlanClient(object):
                 public_service_gdf = gdf[gdf['type'] == public_service]
             else:
                 public_service_gdf = gdf[gdf['type'].isin(public_service)]
-            public_service_centroid = public_service_gdf.centroid.unary_union
+            public_service_centroid = public_service_gdf.centroid.union_all()
 
             num_same_public_service = len(public_service_gdf)
             if num_same_public_service > 0:
@@ -1024,8 +1028,8 @@ class PlanClient(object):
         gdf = self._gdf[self._gdf['existence'] == True]
         green_id = city_config.GREEN_ID
         green_gdf = gdf[(gdf['type'].isin(green_id)) & (gdf.area*self._cell_area >= city_config.GREEN_AREA_THRESHOLD)]
-        green_cover = green_gdf.buffer(300/self._cell_edge_length).unary_union
-        residential = gdf[gdf['type'] == city_config.RESIDENTIAL].unary_union
+        green_cover = green_gdf.buffer(300/self._cell_edge_length).union_all()
+        residential = gdf[gdf['type'] == city_config.RESIDENTIAL].union_all()
         green_covered_residential = green_cover.intersection(residential)
         reward = green_covered_residential.area / residential.area
         return reward
