@@ -9,14 +9,14 @@ import warnings
 import traceback
 
 
-def warn_with_traceback(message, category, filename, lineno, file=None, line=None):
+""" def warn_with_traceback(message, category, filename, lineno, file=None, line=None):
     # 只打印特定 warning
     if category == UserWarning and 'Boolean Series key will be reindexed to match DataFrame index.' in str(message):
         print(f'\n{filename}:{lineno}: {category.__name__}: {message}')
         traceback.print_stack()
 
-warnings.showwarning = warn_with_traceback
-#warnings.simplefilter('always')  # 确保所有 warning 都显示
+warnings.showwarning = warn_with_traceback """
+
 
 def get_boundary_edges(polygon: Polygon, return_type: Text) -> Union[MultiLineString, GeoSeries]:
     """
