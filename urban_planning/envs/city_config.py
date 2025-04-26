@@ -113,24 +113,18 @@ RESIDENTIAL_ID = (
 
 PUBLIC_SERVICES_ID = (
     BUSINESS,
-    BUSINESS_H,
-    SCHOOL,
-    HOSPITAL_L, 
-    HOSPITAL_S,
-    RECREATION,
     A2,
     A3,
     A5,
-    S1
+    S1,
 )
 
 PUBLIC_SERVICES = (
     'shopping',
-    'working',
-    'education',
-    'medical care',
-    'hospital_s',
-    'entertainment',
+    'a2',
+    'a3',
+    'a5',
+    's1'
 )
 
 GREEN_ID = (

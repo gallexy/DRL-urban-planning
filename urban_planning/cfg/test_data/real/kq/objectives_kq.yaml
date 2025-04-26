@@ -92,14 +92,14 @@ carbon_emissions:
   business_h: 906
   green_l: -0.690
   river: 0
-  school: 321
+  school: 320.6
   hospital_l: 773.8
-  hospital_s: 20
+  hospital_s: 773.8
   recreation: 18.9
-  expressway: 100
+  expressway: 578.01
   rb: 346
   a2: 320.6
   a3: 320.6
   a5: 773.8
-  s1: 50
-  industry: 1000
+  s1: 578.01
+  industry: 15920
