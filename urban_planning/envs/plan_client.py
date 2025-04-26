@@ -49,10 +49,11 @@ class PlanClient(object):
         #load initial plan from geojson file directly
         file_path = 'urban_planning/cfg/**/{}.geojson'.format(init_plan_file)
         self.init_plan = load_geojson(file_path)
+        self._base_carbon_emission = 0.0
         self.init_objectives()
         self.init_constraints()
-        self.init_carbon()
         self.restore_plan()
+        self.init_carbon()
 
     def init_carbon(self) -> None:
         """Initializes carbon."""
@@ -70,7 +71,9 @@ class PlanClient(object):
                     # carbon_emission_dict_id[0] = v # Example: Assign to OUTSIDE if key not found
         else:
             self._carbon_emission_dict = None
-        print("Carbon emissions:")
+        self._base_carbon_emission = self.get_carbon_emission_reward()
+        print("base Carbon emissions:"+str(self._base_carbon_emission))
+        print("Carbon emission dict:")
         print(self._carbon_emission_dict)
 
     def init_objectives(self) -> None:
@@ -445,7 +448,11 @@ class PlanClient(object):
         search_min_area = self._required_min_area[land_use_type]
         polygon, polygon_boundary, relation, edges, distance = self._simplify_polygon(polygon, intersection)
         gdf = self._current_gdf
-        all_intersections = gdf[(self._gdf['existence'] == True) & (self._gdf.geom_type == 'Point')].geometry.union_all()
+        existence_mask = gdf['existence'].values == True
+        point_mask = gdf.geom_type.values == 'Point'
+        mask = existence_mask & point_mask
+        all_intersections = gdf.loc[mask, 'geometry'].union_all()
+        #all_intersections = gdf[(self._gdf['existence'] == True) & (self._gdf.geom_type == 'Point')].geometry.union_all()
         min_edge_length = self._required_min_edge_length[land_use_type]
         max_edge_length = self._required_max_edge_length[land_use_type]
         if relation == 'edge':
@@ -979,6 +986,7 @@ class PlanClient(object):
             life_circle_10min_all = np.count_nonzero(
                 public_service_distance*self._cell_edge_length <= 500, axis=0)/public_service_distance.shape[0]
             for index, service_name in enumerate(city_config.PUBLIC_SERVICES):
+                #bug ,如果某些public_services不存在，life_circle_10min_all[index]会溢出，
                 info[service_name] = life_circle_10min_all[index]
             return reward, info
         else:
@@ -1017,7 +1025,8 @@ class PlanClient(object):
             reward += tmp_reward
 
             #碳排放单位为10000吨
-        return reward
+        assert self._base_carbon_emission is not None
+        return reward-self._base_carbon_emission
 
     def get_greenness_reward(self) -> float:
         """Get the reward of the greenness.

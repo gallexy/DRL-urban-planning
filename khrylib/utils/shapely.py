@@ -5,6 +5,18 @@ from geopandas import GeoSeries, GeoDataFrame
 from shapely.geometry import Polygon, MultiLineString, LineString, Point, MultiPoint
 from shapely.ops import snap, substring, nearest_points
 
+import warnings
+import traceback
+
+
+def warn_with_traceback(message, category, filename, lineno, file=None, line=None):
+    # 只打印特定 warning
+    if category == UserWarning and 'Boolean Series key will be reindexed to match DataFrame index.' in str(message):
+        print(f'\n{filename}:{lineno}: {category.__name__}: {message}')
+        traceback.print_stack()
+
+warnings.showwarning = warn_with_traceback
+#warnings.simplefilter('always')  # 确保所有 warning 都显示
 
 def get_boundary_edges(polygon: Polygon, return_type: Text) -> Union[MultiLineString, GeoSeries]:
     """
@@ -188,7 +200,20 @@ def slice_edge(edge: LineString,
     """Slice edge from an end point."""
     if edge.length*cell_edge_length <= search_max_length:
         return edge, True
-    candidate_intersections = intersections[intersections.distance(edge) < epsilon]
+    
+    if isinstance(intersections, (MultiPoint, Point)):
+        # 转为 GeoDataFrame
+        if isinstance(intersections, Point):
+            points = [intersections]
+        else:
+            points = list(intersections.geoms)
+        intersections_gdf = GeoDataFrame(geometry=points)
+    else:
+        intersections_gdf = intersections
+
+    candidate_intersections = intersections_gdf[intersections_gdf.distance(edge) < epsilon]
+
+    #candidate_intersections = intersections[intersections.distance(edge) < epsilon]
     distances = candidate_intersections.distance(point)
     feasible_intersections = candidate_intersections[(distances*cell_edge_length >= min_edge_length) &
                                                      (distances*cell_edge_length <= max_edge_length)]
