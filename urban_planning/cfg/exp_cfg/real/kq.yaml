@@ -4,11 +4,11 @@ init_plan: init_plan_kq
 
 # reward
 reward_specs:
-  road_network_weight: 1.0
-  life_circle_weight: 4.0
-  greenness_weight: 1.0
+  road_network_weight: 0.0
+  life_circle_weight: 1.0
+  greenness_weight: 0.0
   concept_weight: 0.0
-  carbon_emission_weight: 0.1
+  carbon_emission_weight: 0.2
   shaping_weight: 0.0
 
 
@@ -19,7 +19,7 @@ agent_specs:
 
 # training parameters
 skip_land_use: false
-skip_road: false
+skip_road: true
 road_ratio: 0.80
 gamma: 1.0
 tau: 0.0

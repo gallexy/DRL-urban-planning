@@ -90,14 +90,16 @@ carbon_emissions:
   residential_h: 845.9
   business: 193
   business_h: 906
-  green_l: 0
+  green_l: -0.690
   river: 0
   school: 321
   hospital_l: 773.8
   hospital_s: 20
   recreation: 18.9
   expressway: 100
-  br: 346
-  a2: 18.9
-  a3: 321
+  rb: 346
+  a2: 320.6
+  a3: 320.6
+  a5: 773.8
   s1: 50
+  industry: 1000
