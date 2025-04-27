@@ -21,7 +21,7 @@ objectives:
   ratio:
     residential: 0.300
   count:
-    residential: 5
+    residential: 15
     business: 6
     business_h: 4
     green_l: 6
@@ -58,7 +58,7 @@ constraints:
     s1: 1000
     school: 10000
     hospital_s: 2000
-    recreation: 1000
+    recreation: 3000
   max_edge_length:
     residential: 800
     residential_h: 1800

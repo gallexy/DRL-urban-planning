@@ -51,10 +51,13 @@ class PlanClient(object):
         file_path = 'urban_planning/cfg/**/{}.geojson'.format(init_plan_file)
         self.init_plan = load_geojson(file_path)
         self._base_carbon_emission = 0.0
+        self._base_shaping = 0.0
         self.init_objectives()
         self.init_constraints()
         self.restore_plan()
         self.init_carbon()
+        self._base_shaping = self.get_shaping_reward()
+        print("base Shaping:"+str(self._base_shaping))
 
     def init_carbon(self) -> None:
         """Initializes carbon."""
@@ -1287,10 +1290,14 @@ class PlanClient(object):
         """
         gdf = self._gdf[self._gdf['existence'] == True]
         gdf_poly = gdf[gdf['type'].isin(city_config.BLOCK_LAND_TYPE)]
-        shaping_reward = -gdf_poly[gdf_poly['rect']<1]['rect'].to_numpy().sum()
-        gdf_rect= gdf_poly[gdf_poly['rect']==1]
-        abnormal_rect = (gdf_rect['sc']-1).sum()
-        shaping_reward += abnormal_rect/5
+
+        shaping_reward = 0
+        for index, row in gdf_poly.iterrows():
+            polygon = row['geometry']
+            shaping_reward += self._evaluate_polygon_quality(polygon)
+        if self._base_shaping == 0.0:
+            return shaping_reward    #return the raw reward if base shaping is not initialized
+        shaping_reward = (shaping_reward - self._base_shaping)/20   #normalize the reward,should be changed to a constant later!!
 
         return shaping_reward
 
