@@ -252,7 +252,7 @@ class PlanClient(object):
     def fill_leftover(self) -> None:
         """Fill leftover space. use recreation replaced green_s -- by lamb"""
         self._gdf.loc[(self._gdf['type'] == city_config.FEASIBLE) & (self._gdf['existence'] == True),
-                      'type'] = city_config.RECREATION
+                      'type'] = city_config.GREEN_L
 
     def snapshot(self):
         """Snapshot the gdf."""
@@ -433,7 +433,7 @@ class PlanClient(object):
 
         return polygon, polygon_boundary, relation, edges, distance
 
-    def _slice_polygon(self, polygon: Polygon, intersection: Point, land_use_type: int) -> Polygon:
+    def _slice_polygon_old(self, polygon: Polygon, intersection: Point, land_use_type: int) -> Polygon:
         """Slice the polygon from the given intersection.
 
         Args:
@@ -476,6 +476,293 @@ class PlanClient(object):
             raise ValueError('Relation must be edge or corner.')
 
         land_use_polygon = get_intersection_polygon_with_maximum_area(land_use_polygon, polygon)
+        return land_use_polygon
+
+    def _evaluate_polygon_quality(self, polygon: Polygon) -> float:
+        """评估多边形的形状质量，返回0~1之间的评分（1为最佳）"""
+        if polygon is None or not polygon.is_valid:
+            return 0
+            
+        # 获取外接矩形
+        minx, miny, maxx, maxy = polygon.bounds
+        width = maxx - minx
+        height = maxy - miny
+        
+        # 计算参数
+        area = polygon.area
+        perimeter = polygon.length
+        
+        # 防止除零
+        if perimeter == 0 or area == 0:
+            return 0
+        
+        # 计算圆度比(面积/周长比,越接近圆形值越高)
+        circularity = 4 * math.pi * area / (perimeter ** 2)
+        
+        # 计算外接矩形填充率(多边形面积/外接矩形面积)
+        rect_area = width * height
+        rect_fill = area / rect_area if rect_area > 0 else 0
+        
+        # 计算长宽比分数(接近1时最佳)
+        aspect_ratio = max(width/height, height/width) if min(width, height) > 0 else 10
+        aspect_score = 1.0 / aspect_ratio
+        
+        # 判断是否为三角形(通过顶点数判断)
+        exterior_coords = list(polygon.exterior.coords)
+        num_vertices = len(exterior_coords) - 1  # 减去重复的起点
+        triangle_penalty = 0.5 if num_vertices <= 3 else 0
+        
+        # 综合评分
+        final_score = (0.3 * circularity + 0.3 * rect_fill + 0.4 * aspect_score) * (1 - triangle_penalty)
+        return min(max(final_score, 0), 1)  # 确保结果在0-1之间
+
+    def _try_rectangular_cut(self, polygon, edge, intersection, min_edge_length, max_edge_length, max_area):
+        """尝试从边缘进行垂直矩形切割"""
+        try:
+            # 提取边的方向
+            p1, p2 = list(edge.coords)
+            dx = p2[0] - p1[0]
+            dy = p2[1] - p1[1]
+            edge_length = math.sqrt(dx*dx + dy*dy)
+            
+            if edge_length == 0:
+                return None
+            
+            # 计算边的单位向量
+            ux, uy = dx/edge_length, dy/edge_length
+            
+            # 计算垂直方向的单位向量(旋转90度)
+            vx, vy = -uy, ux
+            
+            # 确定切割距离(在min_edge_length和max_edge_length之间)
+            cut_distance = min(max(min_edge_length, edge_length * 0.4), max_edge_length)
+            
+            # 从交点向内部切割
+            cut_point = (
+                intersection.x + vx * cut_distance * self._cell_edge_length, 
+                intersection.y + vy * cut_distance * self._cell_edge_length
+            )
+            
+            # 计算切割线上的两个点(沿着边的方向)
+            cut_length = min(max_edge_length, edge_length * 0.6) * self._cell_edge_length
+            cut_p1 = (
+                intersection.x + ux * cut_length * 0.5,
+                intersection.y + uy * cut_length * 0.5
+            )
+            cut_p2 = (
+                intersection.x - ux * cut_length * 0.5,
+                intersection.y - uy * cut_length * 0.5
+            )
+            
+            # 创建矩形的四个点
+            rect_points = [
+                intersection.coords[0],
+                cut_p1,
+                cut_point,
+                cut_p2
+            ]
+            
+            # 创建矩形并与原多边形求交
+            rect = Polygon(rect_points)
+            result = polygon.intersection(rect)
+            
+            # 检查结果是否有效
+            if result.is_empty or result.area < min_edge_length * min_edge_length * self._cell_area:
+                return None
+                
+            return result
+        except:
+            return None
+
+    def _try_corner_rectangular_cut(self, polygon, corner, edge1, edge2, min_edge_length, max_edge_length, max_area):
+        """尝试从角落进行矩形切割"""
+        try:
+            # 提取两条边的方向
+            e1_p1, e1_p2 = list(edge1.coords)
+            e2_p1, e2_p2 = list(edge2.coords)
+            
+            # 计算两条边的单位向量
+            e1_len = math.sqrt((e1_p2[0]-e1_p1[0])**2 + (e1_p2[1]-e1_p1[1])**2)
+            e2_len = math.sqrt((e2_p2[0]-e2_p1[0])**2 + (e2_p2[1]-e2_p1[1])**2)
+            
+            if e1_len == 0 or e2_len == 0:
+                return None
+            
+            u1_x, u1_y = (e1_p2[0]-e1_p1[0])/e1_len, (e1_p2[1]-e1_p1[1])/e1_len
+            u2_x, u2_y = (e2_p2[0]-e2_p1[0])/e2_len, (e2_p2[1]-e2_p1[1])/e2_len
+            
+            # 确定切割距离
+            cut_dist1 = min(max(min_edge_length, e1_len * 0.4), max_edge_length)
+            cut_dist2 = min(max(min_edge_length, e2_len * 0.4), max_edge_length)
+            
+            # 计算矩形的四个点
+            corner_point = corner.coords[0]
+            p1 = corner_point
+            p2 = (corner_point[0] + u1_x * cut_dist1 * self._cell_edge_length,
+                corner_point[1] + u1_y * cut_dist1 * self._cell_edge_length)
+            p3 = (p2[0] + u2_x * cut_dist2 * self._cell_edge_length,
+                p2[1] + u2_y * cut_dist2 * self._cell_edge_length)
+            p4 = (corner_point[0] + u2_x * cut_dist2 * self._cell_edge_length,
+                corner_point[1] + u2_y * cut_dist2 * self._cell_edge_length)
+            
+            # 创建矩形并求交
+            rect = Polygon([p1, p2, p3, p4])
+            result = polygon.intersection(rect)
+            
+            if result.is_empty or result.area < min_edge_length * min_edge_length * self._cell_area:
+                return None
+                
+            return result
+        except:
+            return None
+
+    def _improve_polygon_shape(self, polygon):
+        """改善多边形形状，尝试简化为矩形"""
+        try:
+            from shapely.geometry import box
+            
+            # 获取最小外接矩形
+            minx, miny, maxx, maxy = polygon.bounds
+            mbr = box(minx, miny, maxx, maxy)
+            
+            # 计算多边形与MBR的重叠率
+            overlap_ratio = polygon.area / mbr.area if mbr.area > 0 else 0
+            
+            # 如果重叠率高，可以尝试用MBR替代
+            if overlap_ratio > 0.7:
+                return mbr
+                
+            # 如果重叠率低，尝试减少边数
+            return polygon.simplify(0.05, preserve_topology=True)
+        except:
+            return polygon  # 出错时返回原多边形
+
+    def _slice_polygon(self, polygon: Polygon, intersection: Point, land_use_type: int) -> Polygon:
+        """增强版多边形切割方法，尽量避免不规则形状和三角形。
+        
+        Args:
+            polygon: 待切割的多边形。
+            intersection: 交点。
+            land_use_type: 土地利用类型。
+            
+        Returns:
+            切割后的多边形。
+        """
+        import math
+        from shapely.geometry import Polygon, MultiPolygon, LineString, Point, MultiPoint
+        
+        # 准备切割参数
+        search_max_length = self._required_max_edge_length[land_use_type] + self._common_min_edge_length
+        search_max_area = self._required_max_area[land_use_type]
+        search_min_area = self._required_min_area[land_use_type]
+        
+        # 简化多边形并确定关系
+        polygon, polygon_boundary, relation, edges, distance = self._simplify_polygon(polygon, intersection)
+        
+        # 获取交点数据
+        gdf = self._current_gdf
+        existence_mask = gdf['existence'].values == True
+        point_mask = gdf.geom_type.values == 'Point'
+        mask = existence_mask & point_mask
+        all_intersections = gdf.loc[mask, 'geometry'].union_all()
+        min_edge_length = self._required_min_edge_length[land_use_type]
+        max_edge_length = self._required_max_edge_length[land_use_type]
+        
+        # 存储候选多边形和其质量评分
+        candidate_polygons = []
+        land_use_polygon = None
+        
+        try:
+            # 根据关系类型执行切割
+            if relation == 'edge':
+                edge = edges[0]
+                
+                # 原始切割方法
+                original_polygon = slice_polygon_from_edge(
+                    polygon, polygon_boundary, edge, intersection, all_intersections, 
+                    distance, self.EPSILON, self._cell_edge_length, 
+                    min_edge_length, max_edge_length, search_max_length,
+                    search_max_area, search_min_area)
+                
+                if original_polygon and original_polygon.is_valid:
+                    quality_score = self._evaluate_polygon_quality(original_polygon)
+                    candidate_polygons.append((original_polygon, quality_score))
+                
+                # 尝试矩形切割(垂直于边)
+                rect_polygon = self._try_rectangular_cut(
+                    polygon, edge, intersection, 
+                    min_edge_length, max_edge_length, search_max_area)
+                
+                if rect_polygon and rect_polygon.is_valid:
+                    rect_score = self._evaluate_polygon_quality(rect_polygon)
+                    candidate_polygons.append((rect_polygon, rect_score))
+                    
+            elif relation == 'corner':
+                edge_1_intersection = MultiPoint(edges[0].coords).difference(intersection)
+                edge_1 = LineString([intersection, edge_1_intersection])
+                edge_2_intersection = MultiPoint(edges[1].coords).difference(intersection)
+                edge_2 = LineString([intersection, edge_2_intersection])
+                
+                # 原始角落切割
+                original_polygon = slice_polygon_from_corner(
+                    polygon, polygon_boundary, intersection, 
+                    edge_1, edge_1_intersection, edge_2, edge_2_intersection,
+                    all_intersections, self.EPSILON, self._cell_edge_length,
+                    min_edge_length, max_edge_length, search_max_length,
+                    search_max_area, search_min_area)
+                    
+                if original_polygon and original_polygon.is_valid:
+                    quality_score = self._evaluate_polygon_quality(original_polygon)
+                    candidate_polygons.append((original_polygon, quality_score))
+                    
+                # 尝试矩形角落切割
+                rect_polygon = self._try_corner_rectangular_cut(
+                    polygon, intersection, edge_1, edge_2,
+                    min_edge_length, max_edge_length, search_max_area)
+                    
+                if rect_polygon and rect_polygon.is_valid:
+                    rect_score = self._evaluate_polygon_quality(rect_polygon)
+                    candidate_polygons.append((rect_polygon, rect_score))
+        except Exception as e:
+            # 如果所有尝试都失败，使用原始方法
+            pass
+        
+        # 选择最佳候选多边形或回退到原始方法
+        if candidate_polygons:
+            # 按质量评分排序并选择最佳
+            candidate_polygons.sort(key=lambda x: x[1], reverse=True)
+            land_use_polygon = candidate_polygons[0][0]
+        else:
+            # 如果没有候选多边形，回退到默认方法
+            if relation == 'edge':
+                land_use_polygon = slice_polygon_from_edge(
+                    polygon, polygon_boundary, edges[0], intersection, all_intersections, 
+                    distance, self.EPSILON, self._cell_edge_length, 
+                    min_edge_length, max_edge_length, search_max_length,
+                    search_max_area, search_min_area)
+            elif relation == 'corner':
+                edge_1_intersection = MultiPoint(edges[0].coords).difference(intersection)
+                edge_1 = LineString([intersection, edge_1_intersection])
+                edge_2_intersection = MultiPoint(edges[1].coords).difference(intersection)
+                edge_2 = LineString([intersection, edge_2_intersection])
+                land_use_polygon = slice_polygon_from_corner(
+                    polygon, polygon_boundary, intersection, edge_1, edge_1_intersection, edge_2, edge_2_intersection,
+                    all_intersections, self.EPSILON, self._cell_edge_length,
+                    min_edge_length, max_edge_length, search_max_length,
+                    search_max_area, search_min_area)
+            else:
+                raise ValueError('Relation must be edge or corner.')
+        
+        # 最后处理
+        land_use_polygon = get_intersection_polygon_with_maximum_area(land_use_polygon, polygon)
+        
+        # 最终检查：如果是三角形或评分很低，可以尝试简单矩形化
+        final_score = self._evaluate_polygon_quality(land_use_polygon)
+        if final_score < 0.3:  # 形状质量太差
+            improved_polygon = self._improve_polygon_shape(land_use_polygon)
+            if improved_polygon and improved_polygon.is_valid and improved_polygon.area > 0:
+                land_use_polygon = improved_polygon
+                
         return land_use_polygon
 
     def _add_remaining_feasible_blocks(self, feasible_polygon: Polygon, land_use_polygon: Polygon) -> None:
