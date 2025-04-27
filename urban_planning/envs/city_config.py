@@ -113,6 +113,7 @@ RESIDENTIAL_ID = (
 
 PUBLIC_SERVICES_ID = (
     BUSINESS,
+    BUSINESS_H,
     A2,
     A3,
     A5,
@@ -120,7 +121,8 @@ PUBLIC_SERVICES_ID = (
 )
 
 PUBLIC_SERVICES = (
-    'shopping',
+    'business',
+    'business_h',
     'a2',
     'a3',
     'a5',

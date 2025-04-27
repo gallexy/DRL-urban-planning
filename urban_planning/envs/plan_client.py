@@ -28,6 +28,7 @@ class PlanClient(object):
         city_config.A2,
         city_config.RESIDENTIAL,
         city_config.BUSINESS,
+        city_config.BUSINESS_H,
         city_config.S1,
         city_config.GREEN_L,
         city_config.RECREATION], dtype=np.int32)
@@ -976,7 +977,7 @@ class PlanClient(object):
             reference_distance = math.sqrt(self._grid_cols**2 + self._grid_rows**2)
             decentralization_reward = np.array(public_service_pairwise_distances).mean()/reference_distance
             utility_reward = public_service_area/self._community_area
-            reward = efficiency_reward + 0.5 * decentralization_reward
+            reward = efficiency_reward + 1.0 * decentralization_reward
             info = {'life_circle_15min': life_circle_15min.mean(),
                     'life_circle_10min': life_circle_10min.mean(),
                     'life_circle_5min': life_circle_5min.mean(),

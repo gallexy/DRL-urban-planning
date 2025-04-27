@@ -21,29 +21,30 @@ objectives:
   ratio:
     residential: 0.300
   count:
-    residential: 18
+    residential: 5
     business: 6
-    green_l: 10
+    business_h: 4
+    green_l: 6
     a3: 3
-    a5: 3
-    a2: 8
+    a5: 2
+    a2: 6
     s1: 5
-    recreation: 5
+    recreation: 1
 constraints:
   max_area:
     residential: 90000
     residential_h: 900000
     green_l: 90000
     hospital_l: 90000
-    business: 90000
-    business_h: 90000
+    business: 50000
+    business_h: 30000
     school: 90000
     hospital_s: 90000
     recreation: 90000
     a2: 90000
     a3: 90000
-    a5: 90000
-    s1: 90000
+    a5: 10000
+    s1: 5000
   min_area:
     residential: 20000
     residential_h: 20000
@@ -53,7 +54,7 @@ constraints:
     business_h: 10000
     a2: 10000
     a3: 10000
-    a5: 10000
+    a5: 3000
     s1: 1000
     school: 10000
     hospital_s: 2000
