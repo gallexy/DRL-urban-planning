@@ -613,7 +613,7 @@ class CityEnv:
     @staticmethod
     def plot_and_save_gdf(gdf: GeoDataFrame, cmap: ListedColormap,
                           save_fig: bool = False, path: Text = None, legend: bool = False,
-                          ticks: bool = True, bbox: bool = True) -> None:
+                          ticks: bool = True, bbox: bool = True, show: bool = True) -> None:
         """
         Plot and save the gdf.
         """
@@ -637,11 +637,12 @@ class CityEnv:
         if save_fig:
             assert path is not None
             plt.savefig(path, format='svg', transparent=True)
-        plt.show()
+        if show:
+            plt.show()
         plt.close()
 
     def visualize(self, save_fig: bool = False, path: Text = None, legend: bool = True,
-                  ticks: bool = True, bbox: bool = True) -> None:
+                  ticks: bool = True, bbox: bool = True, show: bool = True) -> None:
         """
         Visualize the city plan.
         """
@@ -650,7 +651,7 @@ class CityEnv:
         existing_types = sorted([city_config.LAND_USE_ID_MAP_INV[var] for var in land_use_road_gdf['type'].unique()])
         cmap = ListedColormap(
             [city_config.TYPE_COLOR_MAP[var] for var in existing_types])
-        self.plot_and_save_gdf(land_use_road_gdf, cmap, save_fig, path, legend, ticks, bbox)
+        self.plot_and_save_gdf(land_use_road_gdf, cmap, save_fig, path, legend, ticks, bbox, show)
 
     def visualize_xlegend(self, legend_aliases: Dict[str, str] = None, save_fig: bool = False, 
                         path: Text = None, legend: bool = True, ticks: bool = True, 

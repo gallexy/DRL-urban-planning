@@ -479,7 +479,8 @@ class UrbanPlanningAgent(AgentPPO):
                             path=os.path.join(self.cfg.plan_dir, 'step_land_use_0000.svg'),
                             legend=False,
                             ticks=False,
-                            bbox=False)
+                            bbox=False,
+                            show=False)
                     logger.start_episode(self.env)
 
                     info_plan = dict()
@@ -499,7 +500,8 @@ class UrbanPlanningAgent(AgentPPO):
                                     path=os.path.join(self.cfg.plan_dir, f'step_land_use_{t:04d}.svg'),
                                     legend=False,
                                     ticks=False,
-                                    bbox=False)
+                                    bbox=False,
+                                    show=False)
                             if next_state[-1].argmax() != 0:
                                 self.env.visualize_road_and_boundary(
                                     save_fig=True,
@@ -512,7 +514,8 @@ class UrbanPlanningAgent(AgentPPO):
                                 path=os.path.join(self.cfg.plan_dir, f'step_all_{t:04d}.svg'),
                                 legend=False,
                                 ticks=False,
-                                bbox=False)
+                                bbox=False,
+                                show=False  )
                         if done:
                             episode_success = (reward != self.env.FAILURE_REWARD) and \
                                               (reward != self.env.INTERMEDIATE_REWARD)
@@ -566,7 +569,8 @@ class UrbanPlanningAgent(AgentPPO):
                             path=os.path.join(self.cfg.plan_dir, 'step_land_use_0000.svg'),
                             legend=False,
                             ticks=False,
-                            bbox=False)
+                            bbox=False,
+                            show=False)
                     logger.start_episode(self.env)
 
                     info_plan = dict()
@@ -584,20 +588,23 @@ class UrbanPlanningAgent(AgentPPO):
                                     path=os.path.join(self.cfg.plan_dir, f'step_land_use_{t:04d}.svg'),
                                     legend=False,
                                     ticks=False,
-                                    bbox=False)
+                                    bbox=False,
+                                    show=False)
                             if next_state[-1].argmax() != 0:
                                 self.env.visualize_road_and_boundary(
                                     save_fig=True,
                                     path=os.path.join(self.cfg.plan_dir, f'step_road_{t:04d}.svg'),
                                     legend=False,
                                     ticks=False,
-                                    bbox=False)
+                                    bbox=False,
+                                    show=False)
                             self.env.visualize(
                                 save_fig=True,
                                 path=os.path.join(self.cfg.plan_dir, f'step_all_{t:04d}.svg'),
                                 legend=False,
                                 ticks=False,
-                                bbox=False)
+                                bbox=False,
+                                show=False)
                         if done:
                             episode_success = (reward != self.env.FAILURE_REWARD) and \
                                               (reward != self.env.INTERMEDIATE_REWARD)
