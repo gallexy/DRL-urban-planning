@@ -577,7 +577,7 @@ class PlanClient(object):
         except:
             return None
 
-    def _try_corner_rectangular_cut(self, polygon, corner, edge1, edge2, min_edge_length, max_edge_length, max_area):
+    def _try_corner_rectangular_cut_old(self, polygon, corner, edge1, edge2, min_edge_length, max_edge_length, max_area):
         """尝试从角落进行矩形切割"""
         try:
             # 提取两条边的方向
@@ -617,6 +617,74 @@ class PlanClient(object):
                 
             return result
         except:
+            return None
+
+    def _try_corner_rectangular_cut(self, polygon, corner, edge1, edge2, min_edge_length, max_edge_length, max_area):
+        """尝试从角落进行矩形切割，优先全取短边，若不合适再取两边的40%"""
+        import math
+        from shapely.geometry import Polygon, Point
+
+        try:
+            # 提取两条边的方向
+            e1_p1, e1_p2 = list(edge1.coords)
+            e2_p1, e2_p2 = list(edge2.coords)
+
+            # 计算两条边的单位向量和长度
+            e1_len = math.sqrt((e1_p2[0] - e1_p1[0]) ** 2 + (e1_p2[1] - e1_p1[1]) ** 2)
+            e2_len = math.sqrt((e2_p2[0] - e2_p1[0]) ** 2 + (e2_p2[1] - e2_p1[1]) ** 2)
+
+            if e1_len == 0 or e2_len == 0:
+                return None
+
+            u1_x, u1_y = (e1_p2[0] - e1_p1[0]) / e1_len, (e1_p2[1] - e1_p1[1]) / e1_len
+            u2_x, u2_y = (e2_p2[0] - e2_p1[0]) / e2_len, (e2_p2[1] - e2_p1[1]) / e2_len
+
+            # 先找短边和长边
+            if e1_len < e2_len:
+                short_len, long_len = e1_len, e2_len
+                short_unit, long_unit = (u1_x, u1_y), (u2_x, u2_y)
+                short_is_e1 = True
+            else:
+                short_len, long_len = e2_len, e1_len
+                short_unit, long_unit = (u2_x, u2_y), (u1_x, u1_y)
+                short_is_e1 = False
+
+            # 优先全取短边
+            # 条件1：短边长度不超过最大允许
+            # 条件2：长边剩余长度不少于最小允许
+            if short_len <= max_edge_length and (long_len - min_edge_length) >= min_edge_length:
+                cut_dist_short = short_len
+                cut_dist_long = min(long_len, max_edge_length)
+            else:
+                # 退而取40%
+                cut_dist_short = min(max(min_edge_length, short_len * 0.4), max_edge_length)
+                cut_dist_long = min(max(min_edge_length, long_len * 0.4), max_edge_length)
+
+            # 还原到e1/e2顺序
+            if short_is_e1:
+                cut_dist1, cut_dist2 = cut_dist_short, cut_dist_long
+                u1, u2 = short_unit, long_unit
+            else:
+                cut_dist1, cut_dist2 = cut_dist_long, cut_dist_short
+                u1, u2 = long_unit, short_unit
+
+            # 计算矩形四个顶点
+            p0 = corner
+            p1 = (p0[0] + u1[0] * cut_dist1, p0[1] + u1[1] * cut_dist1)
+            p2 = (p1[0] + u2[0] * cut_dist2, p1[1] + u2[1] * cut_dist2)
+            p3 = (p0[0] + u2[0] * cut_dist2, p0[1] + u2[1] * cut_dist2)
+
+            rect = Polygon([p0, p1, p2, p3, p0])
+
+            # 与原多边形相交，得到实际切割块
+            result = polygon.intersection(rect)
+
+            # 检查结果有效性
+            if result.is_empty or result.area < min_edge_length * min_edge_length * self._cell_area:
+                return None
+
+            return result
+        except Exception:
             return None
 
     def _improve_polygon_shape(self, polygon):
