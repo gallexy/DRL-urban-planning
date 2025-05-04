@@ -74,15 +74,20 @@ class UrbanPlanningAgent(AgentPPO):
                     next_state, reward, done, info = self.env.step(action, self.thread_loggers[pid])
                     # cache logging
                     logger_messages.append([reward, info])
+                    
+                    # 只有在没有异常的情况下才执行以下代码
+                    mask = 0 if done else 1
+                    exp = 1 - use_mean_action
+                    # cache memory
+                    memory_messages.append([state, action, mask, next_state, reward, exp])
                 except Exception as e:
                     import traceback
                     traceback.print_exc()
-                    self.thread_loggers[pid].info(f'worker {pid} failed at step {t}.') 
-
-                mask = 0 if done else 1
-                exp = 1 - use_mean_action
-                # cache memory
-                memory_messages.append([state, action, mask, next_state, reward, exp])
+                    self.thread_loggers[pid].info(f'worker {pid} failed at step {t}.')
+                    # 发生异常时中断当前情节
+                    done = True
+                    episode_success = False
+                    break
 
                 if done:
                     episode_success = (reward != self.env.FAILURE_REWARD) and (reward != self.env.INTERMEDIATE_REWARD)

@@ -41,9 +41,9 @@ constraints:
     school: 90000
     hospital_s: 90000
     recreation: 90000
-    a2: 90000
-    a3: 90000
-    a5: 10000
+    a2: 20000
+    a3: 10000
+    a5: 5000
     s1: 5000
   min_area:
     residential: 20000

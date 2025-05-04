@@ -8,7 +8,7 @@ reward_specs:
   life_circle_weight: 1.0
   greenness_weight: 0.0
   concept_weight: 0.0
-  carbon_emission_weight: 0.1
+  carbon_emission_weight: 0.4
   shaping_weight: 1.0
   weight_by_area: true
 
@@ -25,6 +25,7 @@ road_ratio: 0.80
 gamma: 1.0
 tau: 0.0
 state_encoder_specs:
+  encoder_type: transformer
   state_encoder_hidden_size: [64, 16]
   gcn_node_dim: 16
   num_gcn_layers: 2
