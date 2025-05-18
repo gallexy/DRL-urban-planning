@@ -362,8 +362,9 @@ class SGNNStateEncoder(nn.Module):
         """
         batch_size = h_edges.shape[0]
         num_latents = h_edges.shape[2]
-
-        h_nodes = torch.zeros(batch_size, max_num_nodes, num_latents).to(h_edges.device)
+        
+        h_edges = h_edges.to(torch.float32)
+        h_nodes = torch.zeros(batch_size, max_num_nodes, num_latents, dtype=h_edges.dtype, device=h_edges.device)
         count_edge = torch.zeros_like(h_nodes)
         count = torch.broadcast_to(edge_mask.unsqueeze(-1), h_edges.shape).float()
 

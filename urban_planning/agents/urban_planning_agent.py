@@ -1,11 +1,13 @@
 import time
 
+#import torch
 import multiprocessing
 from khrylib.utils import *
 from khrylib.utils.torch import *
 from khrylib.rl.agents import AgentPPO
 from khrylib.rl.core import estimate_advantages, LoggerRL
 from torch.utils.tensorboard import SummaryWriter
+from torch.amp import autocast, GradScaler  # 导入混合精度训练所需的库
 from urban_planning.envs import CityEnv
 from urban_planning.models.model import create_sgnn_model, create_mlp_model, ActorCritic
 from urban_planning.models.baseline import RuleCentralizedPolicy, RuleDecentralizedPolicy, GSCAPolicy, GAPolicy, NullModel
@@ -29,6 +31,9 @@ class UrbanPlanningAgent(AgentPPO):
         self.training = training
         self.device = device
         self.loss_iter = 0
+        # 初始化混合精度训练的GradScaler
+        #self.scaler = None
+        self.scaler = GradScaler() if torch.cuda.is_available() else None
         self.setup_logger(num_threads)
         self.setup_env()
         self.setup_model()
@@ -392,14 +397,33 @@ class UrbanPlanningAgent(AgentPPO):
                 states_b = tensorfy(states_b, self.device)
                 actions_b, advantages_b, returns_b, fixed_log_probs_b, ind = batch_to(
                     self.device, actions_b, advantages_b, returns_b, fixed_log_probs_b, ind)
-                value_loss = self.value_loss(states_b, returns_b)
-                surr_loss, entropy_loss = self.ppo_entropy_loss(
-                    states_b, actions_b, advantages_b, fixed_log_probs_b, ind)
-                loss = surr_loss + self.value_pred_coef * value_loss + self.entropy_coef * entropy_loss
-                self.optimizer.zero_grad()
-                loss.backward()
-                self.clip_policy_grad()
-                self.optimizer.step()
+                
+                # 使用混合精度训练
+                if self.scaler is not None:
+                    # 使用autocast上下文管理器进行混合精度计算
+                    with autocast(device_type='cuda' if torch.cuda.is_available() else 'cpu'):
+                        value_loss = self.value_loss(states_b, returns_b)
+                        surr_loss, entropy_loss = self.ppo_entropy_loss(
+                            states_b, actions_b, advantages_b, fixed_log_probs_b, ind)
+                        loss = surr_loss + self.value_pred_coef * value_loss + self.entropy_coef * entropy_loss
+                    
+                    # 使用GradScaler进行梯度缩放
+                    self.optimizer.zero_grad()
+                    self.scaler.scale(loss).backward()
+                    self.scaler.unscale_(self.optimizer)  # 在梯度裁剪前解除缩放
+                    self.clip_policy_grad()
+                    self.scaler.step(self.optimizer)
+                    self.scaler.update()
+                else:
+                    # 原始的全精度训练
+                    value_loss = self.value_loss(states_b, returns_b)
+                    surr_loss, entropy_loss = self.ppo_entropy_loss(
+                        states_b, actions_b, advantages_b, fixed_log_probs_b, ind)
+                    loss = surr_loss + self.value_pred_coef * value_loss + self.entropy_coef * entropy_loss
+                    self.optimizer.zero_grad()
+                    loss.backward()
+                    self.clip_policy_grad()
+                    self.optimizer.step()
                 epoch_loss += loss.item()
                 epoch_value_loss += value_loss.item()
                 epoch_surr_loss += surr_loss.item()

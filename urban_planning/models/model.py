@@ -14,7 +14,7 @@ def create_sgnn_model(cfg, agent):
         包含策略网络和价值网络的元组
     """
     # 为了保持兼容性，确保使用SGNN编码器
-    cfg.state_encoder_specs['encoder_type'] = 'transformer'
+    cfg.state_encoder_specs['encoder_type'] = 'sgnn'
     shared_net = create_state_encoder(cfg, agent)
     policy_net = UrbanPlanningPolicy(cfg.policy_specs, agent, shared_net)
     value_net = UrbanPlanningValue(cfg.value_specs, agent, shared_net)
@@ -29,7 +29,7 @@ def create_state_encoder(cfg, agent):
     Returns:
         适合的状态编码器实例
     """
-    encoder_type = cfg.state_encoder_specs.get('encoder_type', 'transformer')
+    encoder_type = cfg.state_encoder_specs.get('encoder_type', 'sgnn')
     #encoder_type = 'transformer'
     if encoder_type == 'sgnn':
         return SGNNStateEncoder(cfg.state_encoder_specs, agent)

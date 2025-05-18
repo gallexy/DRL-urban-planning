@@ -25,7 +25,7 @@ road_ratio: 0.80
 gamma: 1.0
 tau: 0.0
 state_encoder_specs:
-  encoder_type: transformer
+  encoder_type: sgnn
   state_encoder_hidden_size: [64, 16]
   gcn_node_dim: 16
   num_gcn_layers: 2
@@ -34,6 +34,13 @@ state_encoder_specs:
   max_num_edges: 5000
   num_attention_heads: 1
 policy_specs:
+  # 是否使用Transformer策略网络
+  use_transformer_policy: true
+  # Transformer策略网络参数
+  transformer_policy_hidden_size: 16
+  transformer_policy_heads: 4
+  transformer_policy_layers: 2
+  # 原始MLP策略网络参数（备用）
   policy_land_use_head_hidden_size: [32, 1]
   policy_road_head_hidden_size: [32, 1]
 value_specs:
@@ -44,9 +51,9 @@ eps: 1.0e-5
 value_pred_coef: 0.5
 entropy_coef: 0.01
 clip_epsilon: 0.2
-max_num_iterations: 100
-num_episodes_per_iteration: 100
+max_num_iterations: 500
+num_episodes_per_iteration: 200
 max_sequence_length: 120
 num_optim_epoch: 4
-mini_batch_size: 256
+mini_batch_size: 64
 save_model_interval: 10
