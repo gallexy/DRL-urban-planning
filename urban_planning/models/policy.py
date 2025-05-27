@@ -24,6 +24,7 @@ class TransformerPolicyHead(nn.Module):
             num_layers=num_layers
         )
         
+        self.attention_mask = None
         # 输出层
         self.output_layer = nn.Linear(hidden_size, 1)
         
@@ -59,14 +60,17 @@ class TransformerPolicyHead(nn.Module):
         # 初始化输出
         logits = torch.zeros(batch_size, seq_len, device=device, dtype=x_proj.dtype)
 
-        if mask is None:
+
+        if mask is not None:
             # 没有mask，直接全量送入Transformer
             x_trans = self.transformer(x_proj)
             logits = self.output_layer(x_trans).squeeze(-1)
             return logits
         
-        #print("True in mask:", mask.sum().item(), mask.shape)
-        #print("False in mask:", (~mask).sum().item())
+        if self.attention_mask is None:
+            self.attention_mask = mask
+        print("True in mask:", mask.sum().item(), mask.shape)
+        #print("True in attention mask:", (self.attention_mask).sum().item(), self.attention_mask.shape)
 
 
         # 动态裁剪：只对有效token做注意力

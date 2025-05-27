@@ -31,14 +31,14 @@ state_encoder_specs:
   num_gcn_layers: 2
   num_edge_fc_layers: 1
   max_num_nodes: 1000
-  max_num_edges: 5000
+  max_num_edges: 4000
   num_attention_heads: 1
 policy_specs:
   # 是否使用Transformer策略网络
   use_transformer_policy: true
   # Transformer策略网络参数
   transformer_policy_hidden_size: 16
-  transformer_policy_heads: 4
+  transformer_policy_heads: 2
   transformer_policy_layers: 2
   # 原始MLP策略网络参数（备用）
   policy_land_use_head_hidden_size: [32, 1]
